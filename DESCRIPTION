@@ -20,3 +20,5 @@ Imports:
     stats, 
     methods
 RoxygenNote: 7.1.0
+Suggests: 
+    testthat
