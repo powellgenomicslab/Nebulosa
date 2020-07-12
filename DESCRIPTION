@@ -1,0 +1,22 @@
+Package: Nebulosa
+Type: Package
+Title: Single-Cell Data Visualisation Using Kernel Gene-Weighted Density Estimation
+Version: 0.1.0
+Author: c(person("Jose", "Alquicira-Hernandez", email = "j.alquicira@garvan.org.au", rol = "aut, cre"))
+Maintainer: Jose Alquicira-Hernandez <j.alquicira@garvan.org.au>
+Description: This package provides a enhanced visualization of single-cell gene expression based on gene-weighted density estimation, particularly for recovering the signal fromm dropped-out genes and inspecting the combined expression from a set of genes.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Depends:
+    ggplot2,
+    patchwork
+Imports:
+    Seurat,
+    SingleCellExperiment,
+    ks,
+    sm,
+    Matrix,
+    stats, 
+    methods
+RoxygenNote: 7.1.0
