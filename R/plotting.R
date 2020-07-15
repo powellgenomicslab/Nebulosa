@@ -1,12 +1,12 @@
 #' @title Plot gene-weighted 2D kernel density
 #' @author Jose Alquicira-Hernandez
 #' @param object Seurat or SingleCellExperiment object
-#' @param features Features (e.g. genes) to visualise
+#' @param features Features (e.g. genes) to visualize
 #' @param thr Numeric threshold to weight the cell density. All cells above this threshold are considered to have the
 #' same weight. By default, the gene expression values are used as weights.
 #' @param slot Type of data: \code{counts} or\code{data} for Seurat objects and \code{counts},
 #' \code{logcounts}, or \code{normcounts} for SingleCellExperiment objects
-#' @param reduction Name of the reduction to visualize. By default, UMAP unless specified
+#' @param reduction Name of the reduction to visualize. If not provided, last computed reduction is visualized
 #' @param dims Vector of length 2 specifying the dimensions to be plotted. By default, the first two dimensions are considered.
 #' @param method Kernel density estimation method:
 #' \itemize{
@@ -21,13 +21,13 @@
 #' @param shape Shape of the geom to be plotted
 #' @param combine Create a single plot? If \code{FALSE}, a list with ggplot objects is returned
 #' @return A scatterplot from a given reduction showing the gene-weighted density
-#' @importFrom Matrix Matrix
+#' @importFrom Matrix Matrix t
 #' @importFrom SingleCellExperiment reducedDims reducedDim colData
-#' @importFrom Seurat GetAssayData Reductions Embeddings
+#' @importFrom Seurat GetAssayData Reductions Embeddings FetchData
 #' @importFrom patchwork wrap_plots
 #' @export
 
-plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c(1,2),
+plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = NULL, dims = c(1,2),
                          method = c("ks", "wkde", "sm"), adjust = 1, size = 1, shape = 16, combine = TRUE){
 
 
@@ -37,32 +37,9 @@ plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c
     stop("Input object must be of 'Seurat' class")
   }
 
-  # Set default reductions --------------------------------------------------
+  # Validate dimensions -----------------------------------------------------
 
-  if(missing(reduction)){
-
-    if(is(object, "Seurat")){
-      reduction <- "umap"
-    }else if(is(object, "SingleCellExperiment")){
-      reduction <- "UMAP"
-    }
-
-  }
-
-
-  # Set default expression data ---------------------------------------------
-
-  if(missing(slot)){
-
-    if(is(object, "Seurat")){
-      slot <- "data"
-    }else if(is(object, "SingleCellExperiment")){
-      slot <- "logcounts"
-    }
-
-  }
-
-
+  if(length(dims) != 2) stop("Only two dimensions can be plotted")
 
 
   # Test existence of reduction ---------------------------------------------
@@ -87,10 +64,55 @@ plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c
 
   }
 
+  # Set default reductions --------------------------------------------------
 
-  # Validate dimensions -----------------------------------------------------
+  if(is(object, "Seurat")){
 
-  if(length(dims) != 2) stop("Only two dimensions can be plotted")
+    reduction_list <- Reductions(object)
+    if(!length(reduction_list)) stop("No reduction has been computed!")
+
+    if(is.null(reduction)){
+      reduction <- reduction_list[length(reduction_list)]
+    }
+      cell_embeddings <- as.data.frame(Embeddings(slot(object, "reductions")[[reduction]]))
+
+
+  }else if(is(object, "SingleCellExperiment")){
+
+    reduction_list <- names(reducedDims(object))
+    if(!length(reduction_list)) stop("No reduction has been computed!")
+
+    if(is.null(reduction)){
+      reduction <- reduction_list[length(reduction_list)]
+    }
+    cell_embeddings <- reducedDim(object, reduction)
+
+  }
+
+
+  # Validate dimensions
+  i <- dims %in% seq_len(ncol(cell_embeddings))
+  if(!all(i)){
+    missing_dims <- dims[which(!i)]
+    stop(paste("Dimension(s) ", missing_dims, " not present in", reduction, "\n  "))
+  }
+
+
+  cell_embeddings <- cell_embeddings[,dims]
+
+
+  # Set default expression data ---------------------------------------------
+
+  if(is.null(slot)){
+
+    if(is(object, "Seurat")){
+      slot <- "data"
+    }else if(is(object, "SingleCellExperiment")){
+      slot <- "logcounts"
+    }
+
+  }
+
 
   # Match method argument ---------------------------------------------------
 
@@ -121,7 +143,7 @@ plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c
 
     if(is(object, "Seurat")){
 
-      exp_data <- GetAssayData(object, slot)
+      exp_data <- FetchData(object, vars = features, slot = slot)
 
     }else if(is(object, "SingleCellExperiment")){
 
@@ -130,48 +152,22 @@ plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c
 
       if(!slot %in% assays) stop(slot, " assay not found")
 
-      exp_data <- object@assays@data[[slot]]
+      exp_data <- Matrix::t(object@assays@data[[slot]])
 
     }
 
     # Extract data for input features
-    i <- rownames(exp_data) %in% features
+    i <- colnames(exp_data) %in% features
     feature_type <- "feature"
     # Test existence of feature in gene expression data
-    if(!any(i)) stop(features[!i], " not present in meta.data or expression data")
-    vars <- exp_data[i,, drop = FALSE]
-    vars <- vars[features, , drop = FALSE]
+    j <- !features %in% colnames(exp_data)
+    if(any(j)) stop("'", paste(features[j], collapse = ", "), "' feature(s) not present in meta.data or expression data")
+    vars <- exp_data[,i, drop = FALSE]
+    vars <- vars[, features, drop = FALSE]
 
   }
 
-  # Extract embeddings ------------------------------------------------------
 
-  if(!is.null(reduction)){
-
-    if(is(object, "Seurat")){
-
-      reduction_list <- Reductions(object)
-      reduction <- reduction_list[length(reduction_list)]
-      cell_embeddings <- as.data.frame(Embeddings(slot(object, "reductions")[[reduction]]))
-
-    }else if(is(object, "SingleCellExperiment")){
-
-      reduction_list <- names(reducedDims(object))
-      cell_embeddings <- reducedDim(object, reduction)
-
-    }
-
-
-  }
-
-  cell_embeddings <- cell_embeddings[,dims]
-
-  # Validate dimensions
-  i <- dims %in% seq_len(ncol(cell_embeddings))
-  if(!all(i)){
-    missing_dims <- dims[which(!i)]
-    stop(paste("Dimension(s) ", missing_dims, " not present in", reduction, "\n  "))
-  }
 
 
   # Plot data
@@ -182,7 +178,7 @@ plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c
   }
 
   if(nrow(vars) > 1){
-    res <- apply(vars, 1, calculate_density, cell_embeddings, method, adjust)
+    res <- apply(vars, 2, calculate_density, cell_embeddings, method, adjust)
     p <- mapply(plot_density_, as.list(as.data.frame(res)), colnames(res),
                 MoreArgs = list(cell_embeddings, dim_names, shape, size, "Density"), SIMPLIFY = FALSE)
 
@@ -200,7 +196,7 @@ plot_density <- function(object, features, thr = NULL, slot, reduction, dims = c
 
   }else{
 
-    z <- calculate_density(vars[1,], cell_embeddings, method, adjust)
+    z <- calculate_density(vars[,1], cell_embeddings, method, adjust)
     p <- plot_density_(z, features, cell_embeddings, dim_names, shape, size, "Density")
 
   }
@@ -292,36 +288,60 @@ get_dens <- function(data, dens, method){
 
 }
 
-calculate_density <- function(w, cell_embeddings, method, adjust){
+
+#' @title Estimate weighted kernel density
+#' @author Jose Alquicira-Hernandez
+#' @param w Vector with weights for each observation
+#' @param x Matrix with dimensions where to calculate the density from. Only the first two dimensions will be used
+#' @param method Kernel density estimation method:
+#' \itemize{
+#' \item \code{ks}: Computes density using the \code{kda} function from the \code{ks} package.
+#' Ideal for small-medium datasets (up to 70,000 cells in a desktop computer). Use other methods for larger datasets.
+#' \item \code{wkde}: Computes density using a modified version of the \code{kde2d} function from the \code{MASS}
+#' package to allow weights. Bandwidth selection from the \code{ks} package is used instead.
+#' \item \code{sm}: Computes density using the \code{sm.density} function from the \code{sm} package
+#' }
+#' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available for \code{ks} method
+#' @param map Whether to map densities to individual observations
+#' @return If \code{map} is \code{TRUE}, a vector with corresponding densities for each observation is returned. Otherwise,
+#' a war a list with the density estimates from the selected method is returned.
+#' @importFrom ks kde hpi
+#' @importFrom sm sm.density
+
+calculate_density <- function(w, x, method, adjust = 1, map = TRUE){
 
   if(method == "ks"){
 
-    dens <- ks::kde(cell_embeddings[,1:2],
-                    w = w / sum(w) * length(w))
+    dens <- kde(x[,1:2],
+                w = w / sum(w) * length(w))
 
   }else if(method == "wkde"){
 
-    dens <- wkde2d(x = cell_embeddings[, 1],
-                   y = cell_embeddings[, 2],
+    dens <- wkde2d(x = x[, 1],
+                   y = x[, 2],
                    w =  w / sum(w) * length(w),
                    adjust = adjust)
 
 
   }else{
-    h1 <- ks::hpi(cell_embeddings[, 1]) * adjust
-    h2 <- ks::hpi(cell_embeddings[, 2]) * adjust
+    h1 <- hpi(x[, 1]) * adjust
+    h2 <- hpi(x[, 2]) * adjust
     h <-  c(h1, h2)
 
-    dens <- quiet(sm::sm.density(cell_embeddings[, 1:2],
-                                 weights = w,
-                                 h = c(h1, h2),
-                                 structure.2d = "separate",
-                                 nbins = 0,
-                                 display = "none"))
+    dens <- quiet(sm.density(x[, 1:2],
+                             weights = w,
+                             h = c(h1, h2),
+                             structure.2d = "separate",
+                             nbins = 0,
+                             display = "none"))
 
   }
 
-  get_dens(cell_embeddings, dens, method)
+  if(map){
+    get_dens(x, dens, method)
+  }else{
+    dens
+  }
 
 
 }
