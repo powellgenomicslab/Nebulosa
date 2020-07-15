@@ -1,10 +1,13 @@
 test_that("plot_density returns a ggplot object", {
-  rclass <- class(plot_density(Seurat::pbmc_small, "CD8A", reduction = "pca"))[2]
-  expect_equal(rclass, "ggplot")
+  expect_is(plot_density(Seurat::pbmc_small, "CD8A", reduction = "pca"), "ggplot")
 })
 
 test_that("plot_density returns error if no feature is provided", {
   expect_error(plot_density(Seurat::pbmc_small))
+})
+
+test_that("plot_density returns error if feature is not present", {
+  expect_error(plot_density(Seurat::pbmc_small, "test"))
 })
 
 test_that("plot_density returns error if non-existent reduction is provided", {

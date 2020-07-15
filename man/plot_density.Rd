@@ -8,8 +8,8 @@ plot_density(
   object,
   features,
   thr = NULL,
-  slot,
-  reduction,
+  slot = NULL,
+  reduction = NULL,
   dims = c(1, 2),
   method = c("ks", "wkde", "sm"),
   adjust = 1,
@@ -21,7 +21,7 @@ plot_density(
 \arguments{
 \item{object}{Seurat or SingleCellExperiment object}
 
-\item{features}{Features (e.g. genes) to visualise}
+\item{features}{Features (e.g. genes) to visualize}
 
 \item{thr}{Numeric threshold to weight the cell density. All cells above this threshold are considered to have the
 same weight. By default, the gene expression values are used as weights.}
@@ -29,7 +29,7 @@ same weight. By default, the gene expression values are used as weights.}
 \item{slot}{Type of data: \code{counts} or\code{data} for Seurat objects and \code{counts},
 \code{logcounts}, or \code{normcounts} for SingleCellExperiment objects}
 
-\item{reduction}{Name of the reduction to visualize. By default, UMAP unless specified}
+\item{reduction}{Name of the reduction to visualize. If not provided, last computed reduction is visualized}
 
 \item{dims}{Vector of length 2 specifying the dimensions to be plotted. By default, the first two dimensions are considered.}
 
