@@ -31,6 +31,11 @@ a war a list with the density estimates from the selected method is returned.
 \description{
 Estimate weighted kernel density
 }
+\examples{
+
+dens <- Nebulosa:::calculate_density(iris[,3],iris[,1:2], method = "wkde")
+
+}
 \author{
 Jose Alquicira-Hernandez
 }
