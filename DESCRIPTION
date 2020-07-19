@@ -19,7 +19,8 @@ Imports:
     Matrix,
     stats, 
     methods
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
+VignetteBuilder: knitr
 Suggests: 
-    testthat
+    testthat, BiocStyle, knitr, rmarkdown
 biocViews: Software, GeneExpression, SingleCell, Visualization, DimensionReduction

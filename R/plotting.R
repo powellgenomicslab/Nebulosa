@@ -174,10 +174,14 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
   dim_names <- colnames(cell_embeddings)
 
   if(!is.null(thr)){
-    vars[vars > thr] <- 1
+    i <- vars > thr
+    if(all(i)) stop("All values are above thr = ", thr)
+
+    vars[i] <- 1
+    vars[!i] <- 0
   }
 
-  if(nrow(vars) > 1){
+  if(ncol(vars) > 1){
     res <- apply(vars, 2, calculate_density, cell_embeddings, method, adjust)
     p <- mapply(plot_density_, as.list(as.data.frame(res)), colnames(res),
                 MoreArgs = list(cell_embeddings, dim_names, shape, size, "Density"), SIMPLIFY = FALSE)
@@ -226,6 +230,23 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
 #' @importFrom Matrix Matrix
 #' @importFrom stats dnorm
 #' @importFrom methods is
+#' @examples
+#'
+#' set.seed(1)
+#' x <- rnorm(100)
+#'
+#' set.seed(2)
+#' y <- rnorm(100)
+#'
+#' set.seed(3)
+#' w <- sample(c(0,1), 100, replace = TRUE)
+#'
+#' dens <- Nebulosa:::wkde2d(x, y, w)
+#'
+
+
+
+
 wkde2d <- function(x, y, w, h, adjust = 1, n = 100, lims = c(range(x), range(y))){
 
   # Validate values and dimensions
@@ -307,6 +328,10 @@ get_dens <- function(data, dens, method){
 #' a war a list with the density estimates from the selected method is returned.
 #' @importFrom ks kde hpi
 #' @importFrom sm sm.density
+#' @examples
+#'
+#' dens <- Nebulosa:::calculate_density(iris[,3],iris[,1:2], method = "wkde")
+#'
 
 calculate_density <- function(w, x, method, adjust = 1, map = TRUE){
 
