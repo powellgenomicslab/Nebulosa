@@ -1,0 +1,23 @@
+language: r
+sudo: true
+cache: packages
+warnings_are_errors: false
+
+# Environment variables for builds
+env:
+  global:
+  - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+
+# Avoid building vignettes
+r_build_args: --no-build-vignettes --no-manual
+
+r:
+  - release
+
+# Code coverage
+r_packages:
+  - covr
+
+# Report coverage for the release version
+after_success:
+  - test $TRAVIS_R_VERSION_STRING = 'release' && Rscript -e 'covr::codecov()'
