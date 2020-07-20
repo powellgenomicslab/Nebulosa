@@ -22,5 +22,5 @@ Imports:
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Suggests: 
-    testthat, BiocStyle, knitr, rmarkdown
+    testthat, BiocStyle, knitr, rmarkdown, covr
 biocViews: Software, GeneExpression, SingleCell, Visualization, DimensionReduction
