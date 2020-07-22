@@ -11,7 +11,8 @@ plot_density_(
   dim_names,
   shape,
   size,
-  legend_title
+  legend_title,
+  joint = 0
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ plot_density_(
 \item{size}{Geom size}
 
 \item{legend_title}{String used as legend title}
+
+\item{joint}{Maximum product of joint densities. For visualization purposes.}
 }
 \value{
 A ggplot object
