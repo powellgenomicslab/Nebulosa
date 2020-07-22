@@ -187,8 +187,10 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
                 MoreArgs = list(cell_embeddings, dim_names, shape, size, "Density"), SIMPLIFY = FALSE)
 
     z <- apply(res, 1, prod)
+    z_max <- apply(res, 2, max)
+    z_max <- Reduce(`*`, z_max)
     joint_label <- paste0(paste(features, "+", sep = ""), collapse = " ")
-    pz <- plot_density_(z, joint_label, cell_embeddings, dim_names, shape, size, "Joint density")
+    pz <- plot_density_(z, joint_label, cell_embeddings, dim_names, shape, size, "Joint density", joint = z_max)
 
 
     if(combine){
@@ -380,10 +382,12 @@ calculate_density <- function(w, x, method, adjust = 1, map = TRUE){
 #' @param shape Geom shape
 #' @param size Geom size
 #' @param legend_title String used as legend title
+#' @param joint Maximum product of joint densities. For visualization purposes.
 #' @return A ggplot object
-#' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs guide_legend theme element_text element_line element_rect element_blank scale_color_viridis_c
+#' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs guide_legend theme element_text element_line element_rect element_blank scale_color_viridis_c scale_color_gradientn
+#' @importFrom viridis viridis
 
-plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, legend_title){
+plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, legend_title, joint = 0){
 
   ggplot(data.frame(cell_embeddings, feature = z)) +
     aes_string(dim_names[1], dim_names[2], color = "feature") +
@@ -392,13 +396,19 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, l
     ylab(gsub("_", " ", dim_names[2])) +
     ggtitle(feature) +
     labs(color = guide_legend(legend_title)) +
-    scale_color_viridis_c() +
     theme(text = element_text(size = 14),
           panel.background = element_blank(),
           axis.text.x = element_text(color = "black"),
           axis.text.y = element_text(color = "black"),
           axis.line = element_line(size = 0.25),
-          strip.background = element_rect(color = "black", fill =  "#ffe5cc"))
+          strip.background = element_rect(color = "black", fill =  "#ffe5cc")) -> p
+
+  if(joint){
+    p <- p + scale_color_gradientn(colors = viridis(10),  limits = c(0, joint))
+  }else{
+    p <- p + scale_color_viridis_c()
+  }
+
 }
 
 
