@@ -20,6 +20,15 @@
 #' @param size Size of the geom to be plotted (e.g. point size)
 #' @param shape Shape of the geom to be plotted
 #' @param combine Create a single plot? If \code{FALSE}, a list with ggplot objects is returned
+#' @param pal String specifying the viridis color palette to use.
+#' Options:
+#' \itemize{
+#' \item \code{viridis}
+#' \item \code{magma}
+#' \item \code{cividis}
+#' \item \code{inferno}
+#' \item \code{plasma}
+#' }
 #' @return A scatterplot from a given reduction showing the gene-weighted density
 #' @importFrom Matrix Matrix t
 #' @importFrom SingleCellExperiment reducedDims reducedDim colData
@@ -28,7 +37,8 @@
 #' @export
 
 plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = NULL, dims = c(1,2),
-                         method = c("ks", "wkde", "sm"), adjust = 1, size = 1, shape = 16, combine = TRUE){
+                         method = c("ks", "wkde", "sm"), adjust = 1, size = 1, shape = 16, combine = TRUE,
+                         pal = "viridis"){
 
 
   # Validate object ---------------------------------------------------------
@@ -184,13 +194,13 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
   if(ncol(vars) > 1){
     res <- apply(vars, 2, calculate_density, cell_embeddings, method, adjust)
     p <- mapply(plot_density_, as.list(as.data.frame(res)), colnames(res),
-                MoreArgs = list(cell_embeddings, dim_names, shape, size, "Density"), SIMPLIFY = FALSE)
+                MoreArgs = list(cell_embeddings, dim_names, shape, size, "Density", pal = pal), SIMPLIFY = FALSE)
 
     z <- apply(res, 1, prod)
     z_max <- apply(res, 2, max)
     z_max <- Reduce(`*`, z_max)
     joint_label <- paste0(paste(features, "+", sep = ""), collapse = " ")
-    pz <- plot_density_(z, joint_label, cell_embeddings, dim_names, shape, size, "Joint density", joint = z_max)
+    pz <- plot_density_(z, joint_label, cell_embeddings, dim_names, shape, size, "Joint density", joint = z_max, pal = pal)
 
 
     if(combine){
@@ -203,7 +213,7 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
   }else{
 
     z <- calculate_density(vars[,1], cell_embeddings, method, adjust)
-    p <- plot_density_(z, features, cell_embeddings, dim_names, shape, size, "Density")
+    p <- plot_density_(z, features, cell_embeddings, dim_names, shape, size, "Density", pal = pal)
 
   }
 
@@ -382,12 +392,14 @@ calculate_density <- function(w, x, method, adjust = 1, map = TRUE){
 #' @param shape Geom shape
 #' @param size Geom size
 #' @param legend_title String used as legend title
-#' @param joint Maximum product of joint densities. For visualization purposes.
+#' @param joint Maximum product of joint densities. For visualization purposes
+#' @param pal String specifying the viridis color palette to use
 #' @return A ggplot object
 #' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs guide_legend theme element_text element_line element_rect element_blank scale_color_viridis_c scale_color_gradientn
 #' @importFrom viridis viridis
 
-plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, legend_title, joint = 0){
+plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, legend_title, joint = 0,
+                          pal = c("viridis", "magma", "cividis", "inferno", "plasma")){
 
   ggplot(data.frame(cell_embeddings, feature = z)) +
     aes_string(dim_names[1], dim_names[2], color = "feature") +
@@ -403,10 +415,25 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, l
           axis.line = element_line(size = 0.25),
           strip.background = element_rect(color = "black", fill =  "#ffe5cc")) -> p
 
+  pal <- match.arg(pal)
+
+  if(pal == "viridis"){
+    pal <- viridis::viridis(10)
+  }else if(pal == "magma"){
+    pal <- viridis::magma(10)
+  }else if(pal == "cividis"){
+    pal <- viridis::cividis(10)
+  }else if(pal == "inferno"){
+    pal <- viridis::inferno(10)
+  }else if(pal == "plasma"){
+    pal <- viridis::plasma(10)
+  }
+
+
   if(joint){
-    p <- p + scale_color_gradientn(colors = viridis(10),  limits = c(0, joint))
+    p <- p + scale_color_gradientn(colors = pal, limits = c(0, joint))
   }else{
-    p <- p + scale_color_viridis_c()
+    p <- p + scale_color_gradientn(colors = pal)
   }
 
 }
