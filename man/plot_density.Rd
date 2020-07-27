@@ -15,7 +15,8 @@ plot_density(
   adjust = 1,
   size = 1,
   shape = 16,
-  combine = TRUE
+  combine = TRUE,
+  pal = "viridis"
 )
 }
 \arguments{
@@ -49,6 +50,16 @@ package to allow weights. Bandwidth selection from the \code{ks} package is used
 \item{shape}{Shape of the geom to be plotted}
 
 \item{combine}{Create a single plot? If \code{FALSE}, a list with ggplot objects is returned}
+
+\item{pal}{String specifying the viridis color palette to use.
+Options:
+\itemize{
+\item \code{viridis}
+\item \code{magma}
+\item \code{cividis}
+\item \code{inferno}
+\item \code{plasma}
+}}
 }
 \value{
 A scatterplot from a given reduction showing the gene-weighted density

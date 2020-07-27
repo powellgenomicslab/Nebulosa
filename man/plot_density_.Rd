@@ -12,7 +12,8 @@ plot_density_(
   shape,
   size,
   legend_title,
-  joint = 0
+  joint = 0,
+  pal = c("viridis", "magma", "cividis", "inferno", "plasma")
 )
 }
 \arguments{
@@ -30,7 +31,9 @@ plot_density_(
 
 \item{legend_title}{String used as legend title}
 
-\item{joint}{Maximum product of joint densities. For visualization purposes.}
+\item{joint}{Maximum product of joint densities. For visualization purposes}
+
+\item{pal}{String specifying the viridis color palette to use}
 }
 \value{
 A ggplot object
