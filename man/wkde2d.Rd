@@ -19,15 +19,19 @@ A scalar value will be taken to apply to both directions.}
 
 \item{adjust}{Bandwidth adjustment}
 
-\item{n}{Number of grid points in each direction. Can be scalar or a length-2 integer vector.}
+\item{n}{Number of grid points in each direction. Can be scalar or a
+length-2 integer vector.}
 
-\item{lims}{The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).}
+\item{lims}{The limits of the rectangle covered by the grid as
+c(xl, xu, yl, yu).}
 }
 \value{
 A list of three components.
 \itemize{
-\item \code{x, y}	The x and y coordinates of the grid points, vectors of length n.
-\item \code{z} An n[1] by n[2] matrix of the weighted estimated density: rows correspond to the value of x, columns to the value of y.
+\item \code{x, y}	The x and y coordinates of the grid points, vectors of
+length n.
+\item \code{z} An n[1] by n[2] matrix of the weighted estimated density:
+rows correspond to the value of x, columns to the value of y.
 }
 }
 \description{

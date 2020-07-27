@@ -24,32 +24,41 @@ plot_density(
 
 \item{features}{Features (e.g. genes) to visualize}
 
-\item{thr}{Numeric threshold to weight the cell density. All cells above this threshold are considered to have the
-same weight. By default, the gene expression values are used as weights.}
+\item{thr}{Numeric threshold to weight the cell density. All cells above this
+threshold are considered to have the same weight. By default, the gene
+expression values are used as weights.}
 
-\item{slot}{Type of data: \code{counts} or\code{data} for Seurat objects and \code{counts},
+\item{slot}{Type of data: \code{counts} or\code{data} for Seurat objects and
+ \code{counts},
 \code{logcounts}, or \code{normcounts} for SingleCellExperiment objects}
 
-\item{reduction}{Name of the reduction to visualize. If not provided, last computed reduction is visualized}
+\item{reduction}{Name of the reduction to visualize. If not provided, last
+computed reduction is visualized}
 
-\item{dims}{Vector of length 2 specifying the dimensions to be plotted. By default, the first two dimensions are considered.}
+\item{dims}{Vector of length 2 specifying the dimensions to be plotted. By
+default, the first two dimensions are considered.}
 
 \item{method}{Kernel density estimation method:
 \itemize{
-\item \code{ks}: Computes density using the \code{kda} function from the \code{ks} package.
-Ideal for small-medium datasets (up to 70,000 cells in a desktop computer). Use other methods for larger datasets.
-\item \code{wkde}: Computes density using a modified version of the \code{kde2d} function from the \code{MASS}
-package to allow weights. Bandwidth selection from the \code{ks} package is used instead.
-\item \code{sm}: Computes density using the \code{sm.density} function from the \code{sm} package
+\item \code{ks}: Computes density using the \code{kda} function from the
+ \code{ks} package.
+\item \code{wkde}: Computes density using a modified version of the
+\code{kde2d} function from the \code{MASS}
+package to allow weights. Bandwidth selection from the \code{ks} package
+ is used instead.
+\item \code{sm}: Computes density using the \code{sm.density} function from
+ the \code{sm} package
 }}
 
-\item{adjust}{Numeric value to adjust to bandwidth. Default: 1. Not available for \code{ks} method}
+\item{adjust}{Numeric value to adjust to bandwidth. Default: 1. Not available
+for \code{ks} method}
 
 \item{size}{Size of the geom to be plotted (e.g. point size)}
 
 \item{shape}{Shape of the geom to be plotted}
 
-\item{combine}{Create a single plot? If \code{FALSE}, a list with ggplot objects is returned}
+\item{combine}{Create a single plot? If \code{FALSE}, a list with ggplot
+objects is returned}
 
 \item{pal}{String specifying the viridis color palette to use.
 Options:
@@ -62,10 +71,17 @@ Options:
 }}
 }
 \value{
-A scatterplot from a given reduction showing the gene-weighted density
+A scatterplot from a given reduction showing the gene-weighted
+ density
 }
 \description{
 Plot gene-weighted 2D kernel density
+}
+\examples{
+
+data <- Seurat::pbmc_small
+plot_density(data, "CD3E")
+
 }
 \author{
 Jose Alquicira-Hernandez

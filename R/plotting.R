@@ -2,24 +2,33 @@
 #' @author Jose Alquicira-Hernandez
 #' @param object Seurat or SingleCellExperiment object
 #' @param features Features (e.g. genes) to visualize
-#' @param thr Numeric threshold to weight the cell density. All cells above this threshold are considered to have the
-#' same weight. By default, the gene expression values are used as weights.
-#' @param slot Type of data: \code{counts} or\code{data} for Seurat objects and \code{counts},
+#' @param thr Numeric threshold to weight the cell density. All cells above this
+#'  threshold are considered to have the same weight. By default, the gene
+#'  expression values are used as weights.
+#' @param slot Type of data: \code{counts} or\code{data} for Seurat objects and
+#'  \code{counts},
 #' \code{logcounts}, or \code{normcounts} for SingleCellExperiment objects
-#' @param reduction Name of the reduction to visualize. If not provided, last computed reduction is visualized
-#' @param dims Vector of length 2 specifying the dimensions to be plotted. By default, the first two dimensions are considered.
+#' @param reduction Name of the reduction to visualize. If not provided, last
+#'  computed reduction is visualized
+#' @param dims Vector of length 2 specifying the dimensions to be plotted. By
+#'  default, the first two dimensions are considered.
 #' @param method Kernel density estimation method:
 #' \itemize{
-#' \item \code{ks}: Computes density using the \code{kda} function from the \code{ks} package.
-#' Ideal for small-medium datasets (up to 70,000 cells in a desktop computer). Use other methods for larger datasets.
-#' \item \code{wkde}: Computes density using a modified version of the \code{kde2d} function from the \code{MASS}
-#' package to allow weights. Bandwidth selection from the \code{ks} package is used instead.
-#' \item \code{sm}: Computes density using the \code{sm.density} function from the \code{sm} package
+#' \item \code{ks}: Computes density using the \code{kda} function from the
+#'  \code{ks} package.
+#' \item \code{wkde}: Computes density using a modified version of the
+#' \code{kde2d} function from the \code{MASS}
+#' package to allow weights. Bandwidth selection from the \code{ks} package
+#'  is used instead.
+#' \item \code{sm}: Computes density using the \code{sm.density} function from
+#'  the \code{sm} package
 #' }
-#' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available for \code{ks} method
+#' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available
+#'  for \code{ks} method
 #' @param size Size of the geom to be plotted (e.g. point size)
 #' @param shape Shape of the geom to be plotted
-#' @param combine Create a single plot? If \code{FALSE}, a list with ggplot objects is returned
+#' @param combine Create a single plot? If \code{FALSE}, a list with ggplot
+#'  objects is returned
 #' @param pal String specifying the viridis color palette to use.
 #' Options:
 #' \itemize{
@@ -29,16 +38,23 @@
 #' \item \code{inferno}
 #' \item \code{plasma}
 #' }
-#' @return A scatterplot from a given reduction showing the gene-weighted density
+#' @return A scatterplot from a given reduction showing the gene-weighted
+#'  density
 #' @importFrom Matrix Matrix t
 #' @importFrom SingleCellExperiment reducedDims reducedDim colData
 #' @importFrom Seurat GetAssayData Reductions Embeddings FetchData
 #' @importFrom patchwork wrap_plots
 #' @export
+#' @examples
+#'
+#' data <- Seurat::pbmc_small
+#' plot_density(data, "CD3E")
+#'
 
-plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = NULL, dims = c(1,2),
-                         method = c("ks", "wkde", "sm"), adjust = 1, size = 1, shape = 16, combine = TRUE,
-                         pal = "viridis"){
+plot_density <- function(object, features, thr = NULL, slot = NULL,
+                         reduction = NULL, dims = c(1,2),
+                         method = c("ks", "wkde", "sm"), adjust = 1,
+                         size = 1, shape = 16, combine = TRUE, pal = "viridis"){
 
 
   # Validate object ---------------------------------------------------------
@@ -84,7 +100,8 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
     if(is.null(reduction)){
       reduction <- reduction_list[length(reduction_list)]
     }
-      cell_embeddings <- as.data.frame(Embeddings(slot(object, "reductions")[[reduction]]))
+      cell_embeddings <- as.data.frame(Embeddings(slot(object,
+                                                       "reductions")[[reduction]]))
 
 
   }else if(is(object, "SingleCellExperiment")){
@@ -104,7 +121,10 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
   i <- dims %in% seq_len(ncol(cell_embeddings))
   if(!all(i)){
     missing_dims <- dims[which(!i)]
-    stop(paste("Dimension(s) ", missing_dims, " not present in", reduction, "\n  "))
+    stop(paste("Dimension(s) ",
+               missing_dims,
+               " not present in",
+               reduction, "\n  "))
   }
 
 
@@ -171,7 +191,8 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
     feature_type <- "feature"
     # Test existence of feature in gene expression data
     j <- !features %in% colnames(exp_data)
-    if(any(j)) stop("'", paste(features[j], collapse = ", "), "' feature(s) not present in meta.data or expression data")
+    if(any(j)) stop("'", paste(features[j], collapse = ", "),
+                    "' feature(s) not present in meta.data or expression data")
     vars <- exp_data[,i, drop = FALSE]
     vars <- vars[, features, drop = FALSE]
 
@@ -194,13 +215,15 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
   if(ncol(vars) > 1){
     res <- apply(vars, 2, calculate_density, cell_embeddings, method, adjust)
     p <- mapply(plot_density_, as.list(as.data.frame(res)), colnames(res),
-                MoreArgs = list(cell_embeddings, dim_names, shape, size, "Density", pal = pal), SIMPLIFY = FALSE)
+                MoreArgs = list(cell_embeddings, dim_names, shape, size,
+                                "Density", pal = pal), SIMPLIFY = FALSE)
 
     z <- apply(res, 1, prod)
     z_max <- apply(res, 2, max)
     z_max <- Reduce(`*`, z_max)
     joint_label <- paste0(paste(features, "+", sep = ""), collapse = " ")
-    pz <- plot_density_(z, joint_label, cell_embeddings, dim_names, shape, size, "Joint density", joint = z_max, pal = pal)
+    pz <- plot_density_(z, joint_label, cell_embeddings, dim_names, shape, size,
+                        "Joint density", joint = z_max, pal = pal)
 
 
     if(combine){
@@ -213,7 +236,8 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
   }else{
 
     z <- calculate_density(vars[,1], cell_embeddings, method, adjust)
-    p <- plot_density_(z, features, cell_embeddings, dim_names, shape, size, "Density", pal = pal)
+    p <- plot_density_(z, features, cell_embeddings, dim_names, shape, size,
+                       "Density", pal = pal)
 
   }
 
@@ -232,12 +256,16 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
 #' Defaults to normal reference bandwidth (ks::hpi).
 #' A scalar value will be taken to apply to both directions.
 #' @param adjust Bandwidth adjustment
-#' @param n Number of grid points in each direction. Can be scalar or a length-2 integer vector.
-#' @param lims The limits of the rectangle covered by the grid as c(xl, xu, yl, yu).
+#' @param n Number of grid points in each direction. Can be scalar or a
+#' length-2 integer vector.
+#' @param lims The limits of the rectangle covered by the grid as
+#' c(xl, xu, yl, yu).
 #' @return A list of three components.
 #' \itemize{
-#' \item \code{x, y}	The x and y coordinates of the grid points, vectors of length n.
-#' \item \code{z} An n[1] by n[2] matrix of the weighted estimated density: rows correspond to the value of x, columns to the value of y.
+#' \item \code{x, y}	The x and y coordinates of the grid points, vectors of
+#' length n.
+#' \item \code{z} An n[1] by n[2] matrix of the weighted estimated density:
+#' rows correspond to the value of x, columns to the value of y.
 #' }
 #' @importFrom Matrix Matrix
 #' @importFrom stats dnorm
@@ -259,7 +287,8 @@ plot_density <- function(object, features, thr = NULL, slot = NULL, reduction = 
 
 
 
-wkde2d <- function(x, y, w, h, adjust = 1, n = 100, lims = c(range(x), range(y))){
+wkde2d <- function(x, y, w, h, adjust = 1, n = 100,
+                   lims = c(range(x), range(y))){
 
   # Validate values and dimensions
   nx <- length(x)
@@ -325,18 +354,26 @@ get_dens <- function(data, dens, method){
 #' @title Estimate weighted kernel density
 #' @author Jose Alquicira-Hernandez
 #' @param w Vector with weights for each observation
-#' @param x Matrix with dimensions where to calculate the density from. Only the first two dimensions will be used
+#' @param x Matrix with dimensions where to calculate the density from. Only
+#' the first two dimensions will be used
 #' @param method Kernel density estimation method:
 #' \itemize{
-#' \item \code{ks}: Computes density using the \code{kda} function from the \code{ks} package.
-#' Ideal for small-medium datasets (up to 70,000 cells in a desktop computer). Use other methods for larger datasets.
-#' \item \code{wkde}: Computes density using a modified version of the \code{kde2d} function from the \code{MASS}
-#' package to allow weights. Bandwidth selection from the \code{ks} package is used instead.
-#' \item \code{sm}: Computes density using the \code{sm.density} function from the \code{sm} package
+#' \item \code{ks}: Computes density using the \code{kda} function from the
+#'  \code{ks} package.
+#' Ideal for small-medium datasets (up to 70,000 cells in a desktop computer).
+#'  Use other methods for larger datasets.
+#' \item \code{wkde}: Computes density using a modified version of the
+#'  \code{kde2d} function from the \code{MASS}
+#' package to allow weights. Bandwidth selection from the \code{ks} package
+#'  is used instead.
+#' \item \code{sm}: Computes density using the \code{sm.density} function from
+#'  the \code{sm} package
 #' }
-#' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available for \code{ks} method
+#' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available
+#'  for \code{ks} method
 #' @param map Whether to map densities to individual observations
-#' @return If \code{map} is \code{TRUE}, a vector with corresponding densities for each observation is returned. Otherwise,
+#' @return If \code{map} is \code{TRUE}, a vector with corresponding densities
+#'  for each observation is returned. Otherwise,
 #' a war a list with the density estimates from the selected method is returned.
 #' @importFrom ks kde hpi
 #' @importFrom sm sm.density
@@ -395,13 +432,18 @@ calculate_density <- function(w, x, method, adjust = 1, map = TRUE){
 #' @param joint Maximum product of joint densities. For visualization purposes
 #' @param pal String specifying the viridis color palette to use
 #' @return A ggplot object
-#' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs guide_legend theme element_text element_line element_rect element_blank scale_color_viridis_c scale_color_gradientn
+#' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs
+#' guide_legend theme element_text element_line element_rect element_blank
+#' scale_color_viridis_c scale_color_gradientn
 #' @importFrom viridis viridis
 
-plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, legend_title, joint = 0,
-                          pal = c("viridis", "magma", "cividis", "inferno", "plasma")){
+plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
+                          legend_title,
+                          joint = 0,
+                          pal = c("viridis", "magma", "cividis",
+                                  "inferno", "plasma")){
 
-  ggplot(data.frame(cell_embeddings, feature = z)) +
+  p <- ggplot(data.frame(cell_embeddings, feature = z)) +
     aes_string(dim_names[1], dim_names[2], color = "feature") +
     geom_point(shape = shape, size = size) +
     xlab(gsub("_", " ", dim_names[1])) +
@@ -413,7 +455,7 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size, l
           axis.text.x = element_text(color = "black"),
           axis.text.y = element_text(color = "black"),
           axis.line = element_line(size = 0.25),
-          strip.background = element_rect(color = "black", fill =  "#ffe5cc")) -> p
+          strip.background = element_rect(color = "black", fill = "#ffe5cc"))
 
   pal <- match.arg(pal)
 
