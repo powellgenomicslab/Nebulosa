@@ -46,10 +46,9 @@ set.seed(2)
 y <- rnorm(100)
 
 set.seed(3)
-w <- sample(c(0,1), 100, replace = TRUE)
+w <- sample(c(0, 1), 100, replace = TRUE)
 
 dens <- Nebulosa:::wkde2d(x, y, w)
-
 }
 \author{
 Jose Alquicira-Hernandez

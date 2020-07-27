@@ -41,8 +41,7 @@ Estimate weighted kernel density
 }
 \examples{
 
-dens <- Nebulosa:::calculate_density(iris[,3],iris[,1:2], method = "wkde")
-
+dens <- Nebulosa:::calculate_density(iris[, 3], iris[, 1:2], method = "wkde")
 }
 \author{
 Jose Alquicira-Hernandez

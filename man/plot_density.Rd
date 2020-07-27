@@ -81,7 +81,6 @@ Plot gene-weighted 2D kernel density
 
 data <- Seurat::pbmc_small
 plot_density(data, "CD3E")
-
 }
 \author{
 Jose Alquicira-Hernandez
