@@ -16,7 +16,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends:
-    R (>= 3.5.0),
+    R (>= 4.0),
     ggplot2,
     patchwork
 Imports:
