@@ -2,9 +2,16 @@ Package: Nebulosa
 Type: Package
 Title: Single-Cell Data Visualisation Using Kernel Gene-Weighted Density Estimation
 Version: 0.1.0
-Authors@R: c(person("Jose", "Alquicira-Hernandez", email = "alquicirajose@gmail.com",
-        role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9049-7780")))
-Description: This package provides a enhanced visualization of single-cell gene expression based on gene-weighted density estimation, particularly for recovering the signal from dropped-out genes and inspecting the combined expression from a set of genes.
+Authors@R: c(person("Jose", "Alquicira-Hernandez", 
+    email = "alquicirajose@gmail.com",
+    role = c("aut", "cre"), 
+    comment = c(ORCID = "0000-0002-9049-7780")))
+Description: This package provides a enhanced visualization of single-cell data 
+    based on gene-weighted density estimation, particularly for recovering the 
+    signal from dropped-out features and inspecting the combined expression from 
+    a set of genes.
+URL: https://github.com/powellgenomicslab/Nebulosa
+BugReports: https://github.com/powellgenomicslab/Nebulosa/issues
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -25,4 +32,6 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Suggests: 
     testthat, BiocStyle, knitr, rmarkdown, covr
-biocViews: Software, GeneExpression, SingleCell, Visualization, DimensionReduction
+biocViews: 
+    Software, GeneExpression, SingleCell, Visualization, 
+    DimensionReduction
