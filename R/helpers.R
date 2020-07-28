@@ -40,7 +40,7 @@
 }
 
 
-
+#' @importFrom patchwork wrap_plots
 .plot_final_density <- function(vars, cell_embeddings, features, method,
                                 adjust, shape, size, pal, combine) {
     dim_names <- colnames(cell_embeddings)

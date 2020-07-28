@@ -42,7 +42,7 @@
 #'
 #' data <- Seurat::pbmc_small
 #' plot_density(data, "CD3E")
-setGeneric("plot_density", function(object, features, thr = NULL, slot = NULL,
+setGeneric("plot_density", function(object, features, slot = NULL,
                                     reduction = NULL, dims = c(1, 2),
                                     method = c("ks", "wkde", "sm"),
                                     adjust = 1, size = 1, shape = 16,
@@ -54,7 +54,7 @@ setGeneric("plot_density", function(object, features, thr = NULL, slot = NULL,
 #' @describeIn plot_density Plot gene-weighted 2D kernel density
 setMethod("plot_density", signature("Seurat"),
           function(object,
-                   features, thr = NULL, slot = NULL, reduction = NULL,
+                   features, slot = NULL, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde", "sm"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis") {
 
@@ -111,7 +111,7 @@ setMethod("plot_density", signature("Seurat"),
 #' @describeIn plot_density Plot gene-weighted 2D kernel density
 setMethod("plot_density", signature("SingleCellExperiment"),
           function(object,
-                   features, thr = NULL, slot = NULL, reduction = NULL,
+                   features, slot = NULL, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde", "sm"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis") {
 

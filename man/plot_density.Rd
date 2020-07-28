@@ -9,7 +9,6 @@
 plot_density(
   object,
   features,
-  thr = NULL,
   slot = NULL,
   reduction = NULL,
   dims = c(1, 2),
@@ -24,7 +23,6 @@ plot_density(
 \S4method{plot_density}{Seurat}(
   object,
   features,
-  thr = NULL,
   slot = NULL,
   reduction = NULL,
   dims = c(1, 2),
@@ -39,7 +37,6 @@ plot_density(
 \S4method{plot_density}{SingleCellExperiment}(
   object,
   features,
-  thr = NULL,
   slot = NULL,
   reduction = NULL,
   dims = c(1, 2),
