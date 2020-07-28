@@ -17,8 +17,8 @@ on kernel density estimation. Due to the sparsity observed in single-cell data
 (e.g. RNA-seq, ATAC-seq), the visualization of cell features is frequently 
 affected and unclear, especially when it is overlayed with clustering
 to annotate cell types. `Nebulosa` integrates the "cell density" from a low
-dimensional space along with the expression values of a cell feature (e.g. gene, 
-peak) to draw more informed conclusions about the identity and the
+dimensional space along with the expression values of a cell feature (e.g. 
+gene, peak) to draw more informed conclusions about the identity and the
 dynamics of cell populations.
 
 # Import libraries
@@ -39,32 +39,41 @@ dataset is commonly used in Seurat vignettes. The code below will download,
 store, and uncompress the data in a temporary directory.
 
 ```{r download_and_untar_file}
-download.file("https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz", 
-              file.path(tempdir(), "pbmc3k.tar.gz"))
+download.file(
+  "https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz",
+  file.path(tempdir(), "pbmc3k.tar.gz")
+)
 
-untar(file.path(tempdir(), "pbmc3k.tar.gz"), 
-      exdir = file.path(tempdir(), 
-                        "pbmc3k"))
+untar(file.path(tempdir(), "pbmc3k.tar.gz"),
+  exdir = file.path(
+    tempdir(),
+    "pbmc3k"
+  )
+)
 ```
 
 
 Then, we can read the gene expression matrix using the `Read10X` from `Seurat`
 
 ```{r read_data}
-data <- Read10X(data.dir = file.path(tempdir(), 
-                                     "pbmc3k",
-                                     "filtered_gene_bc_matrices",
-                                     "hg19"))
+data <- Read10X(data.dir = file.path(
+  tempdir(),
+  "pbmc3k",
+  "filtered_gene_bc_matrices",
+  "hg19"
+))
 ```
 
 Let's create an object with features being expressed in at least 3 cells and 
 cells expressing at least 200 genes.
 
 ```{r create_seurat_object}
-pbmc <- CreateSeuratObject(counts = data, 
-                           project = "pbmc3k", 
-                           min.cells = 3, 
-                           min.features = 200)
+pbmc <- CreateSeuratObject(
+  counts = data,
+  project = "pbmc3k",
+  min.cells = 3,
+  min.features = 200
+)
 ```
 
 Remove outlier cells based on the number of genes being expressed in each cell 
@@ -195,13 +204,3 @@ Notice that these cells are mainly constrained to cluster `0`
 ```{r fig.height=10}
 p4[[3]] / DimPlot(pbmc, label = TRUE, repel = TRUE)
 ```
-
-
-
-
-
-
-
-
-
-
