@@ -5,6 +5,7 @@
 #' @param slot Type of data: \code{counts} or\code{data} for Seurat objects and
 #'  \code{counts},
 #' \code{logcounts}, or \code{normcounts} for SingleCellExperiment objects
+#' @param joint Return joint density plot? By default \code{FALSE}
 #' @param reduction Name of the reduction to visualize. If not provided, last
 #'  computed reduction is visualized
 #' @param dims Vector of length 2 specifying the dimensions to be plotted. By
@@ -43,7 +44,8 @@
 #' data <- Seurat::pbmc_small
 #' plot_density(data, "CD3E")
 setGeneric("plot_density", function(object, features, slot = NULL,
-                                    reduction = NULL, dims = c(1, 2),
+                                    joint = FALSE, reduction = NULL,
+                                    dims = c(1, 2),
                                     method = c("ks", "wkde", "sm"),
                                     adjust = 1, size = 1, shape = 16,
                                     combine = TRUE, pal = "viridis")
@@ -54,7 +56,7 @@ setGeneric("plot_density", function(object, features, slot = NULL,
 #' @describeIn plot_density Plot gene-weighted 2D kernel density
 setMethod("plot_density", signature("Seurat"),
           function(object,
-                   features, slot = NULL, reduction = NULL,
+                   features, slot = NULL, joint = FALSE, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde", "sm"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis") {
 
@@ -99,8 +101,8 @@ setMethod("plot_density", signature("Seurat"),
                   exp_data <- FetchData(object, vars = features, slot = slot)
                   vars <- .extract_feature_data(exp_data, features)
               }
-              .plot_final_density(vars, cell_embeddings, features, method,
-                                  adjust, shape, size, pal, combine)
+              .plot_final_density(vars, cell_embeddings, features, joint,
+                                  method, adjust, shape, size, pal, combine)
           })
 
 
@@ -111,7 +113,7 @@ setMethod("plot_density", signature("Seurat"),
 #' @describeIn plot_density Plot gene-weighted 2D kernel density
 setMethod("plot_density", signature("SingleCellExperiment"),
           function(object,
-                   features, slot = NULL, reduction = NULL,
+                   features, slot = NULL, joint = FALSE, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde", "sm"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis") {
 
@@ -159,6 +161,6 @@ setMethod("plot_density", signature("SingleCellExperiment"),
                   exp_data <- Matrix::t(object@assays@data[[slot]])
                   vars <- .extract_feature_data(exp_data, features)
               }
-              .plot_final_density(vars, cell_embeddings, features, method,
-                                  adjust, shape, size, pal, combine)
+              .plot_final_density(vars, cell_embeddings, features, joint,
+                                  method, adjust, shape, size, pal, combine)
           })

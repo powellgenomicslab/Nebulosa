@@ -169,9 +169,17 @@ cluster next to CD4+ CCR7+ and separate from the rest of CD8+ cells. Let's aim
 to identify Naive CD8+ T cells. To do so, we can just add another gene to the 
 vector containing the features to visualize. 
 
-```{r fig.height=14}
+```{r fig.height=10}
 p3 <- plot_density(pbmc, c("CD8A", "CCR7"))
 p3 + plot_layout(ncol = 1)
+```
+
+`Nebulosa` can return a *joint density* plot by multiplying the densities 
+from all query genes by using the `joint = TRUE` parameter:
+
+```{r fig.height=14}
+p4 <- plot_density(pbmc, c("CD8A", "CCR7"), joint = TRUE)
+p4 + plot_layout(ncol = 1)
 ```
 
 When compared to the clustering results, we can easily identify that Naive 
@@ -185,7 +193,7 @@ estimate.
 
 
 ```{r}
-p_list <- plot_density(pbmc, c("CD8A", "CCR7"), combine = FALSE)
+p_list <- plot_density(pbmc, c("CD8A", "CCR7"), joint = TRUE, combine = FALSE)
 p_list[[length(p_list)]]
 ```
 
@@ -195,7 +203,7 @@ Likewise, the identification of Naive CD4+ T cells becomes straightforward by
 combining `CD4` and `CCR7`:
 
 ```{r fig.height=14}
-p4 <- plot_density(pbmc, c("CD4", "CCR7"))
+p4 <- plot_density(pbmc, c("CD4", "CCR7"), joint = TRUE)
 p4 + plot_layout(ncol = 1)
 ```
 

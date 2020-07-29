@@ -41,7 +41,7 @@
 
 
 #' @importFrom patchwork wrap_plots
-.plot_final_density <- function(vars, cell_embeddings, features, method,
+.plot_final_density <- function(vars, cell_embeddings, features, joint, method,
                                 adjust, shape, size, pal, combine) {
     dim_names <- colnames(cell_embeddings)
     if (ncol(vars) > 1) {
@@ -56,26 +56,36 @@
                     ), SIMPLIFY = FALSE
         )
 
-        z <- apply(res, 1, prod)
-        z_max <- apply(res, 2, max)
-        z_max <- Reduce(`*`, z_max)
-        joint_label <- paste0(paste(features, "+", sep = ""), collapse = " ")
-        pz <- plot_density_(z, joint_label, cell_embeddings,
-                            dim_names,
-                            shape,
-                            size,
-                            "Joint density",
-                            joint = z_max,
-                            pal = pal
-        )
+        if(joint){
+
+            z <- apply(res, 1, prod)
+            z_max <- apply(res, 2, max)
+            z_max <- Reduce(`*`, z_max)
+            joint_label <- paste0(paste(features, "+", sep = ""), collapse = " ")
+            pz <- plot_density_(z, joint_label, cell_embeddings,
+                                dim_names,
+                                shape,
+                                size,
+                                "Joint density",
+                                joint = z_max,
+                                pal = pal
+            )
 
 
-        if (combine) {
-            p <- wrap_plots(p) + pz
-        } else {
-            p <- c(p, list(pz))
-            names(p) <- c(features, joint_label)
+            if (combine) {
+                p <- wrap_plots(p) + pz
+            } else {
+                p <- c(p, list(pz))
+                names(p) <- c(features, joint_label)
+            }
+        }else{
+            if (combine) {
+                p <- wrap_plots(p)
+            } else {
+                names(p) <- features
+            }
         }
+
     } else {
         z <- calculate_density(vars[, 1], cell_embeddings, method, adjust)
         p <- plot_density_(z,
