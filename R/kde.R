@@ -109,7 +109,6 @@ get_dens <- function(data, dens, method) {
 #'  for each observation is returned. Otherwise,
 #' a list with the density estimates from the selected method is returned.
 #' @importFrom ks kde hpi
-#' @importFrom sm sm.density
 #' @examples
 #'
 #' dens <- Nebulosa:::calculate_density(iris[, 3], iris[, 1:2], method = "wkde")
