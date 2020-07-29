@@ -18,6 +18,7 @@
 #' \code{kde2d} function from the \code{MASS}
 #' package to allow weights. Bandwidth selection from the \code{ks} package
 #'  is used instead.
+#' }
 #' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available
 #'  for \code{ks} method
 #' @param size Size of the geom to be plotted (e.g. point size)
