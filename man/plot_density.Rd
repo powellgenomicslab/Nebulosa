@@ -10,6 +10,7 @@ plot_density(
   object,
   features,
   slot = NULL,
+  joint = FALSE,
   reduction = NULL,
   dims = c(1, 2),
   method = c("ks", "wkde", "sm"),
@@ -24,6 +25,7 @@ plot_density(
   object,
   features,
   slot = NULL,
+  joint = FALSE,
   reduction = NULL,
   dims = c(1, 2),
   method = c("ks", "wkde", "sm"),
@@ -38,6 +40,7 @@ plot_density(
   object,
   features,
   slot = NULL,
+  joint = FALSE,
   reduction = NULL,
   dims = c(1, 2),
   method = c("ks", "wkde", "sm"),
@@ -56,6 +59,8 @@ plot_density(
 \item{slot}{Type of data: \code{counts} or\code{data} for Seurat objects and
  \code{counts},
 \code{logcounts}, or \code{normcounts} for SingleCellExperiment objects}
+
+\item{joint}{Return joint density plot? By default \code{FALSE}}
 
 \item{reduction}{Name of the reduction to visualize. If not provided, last
 computed reduction is visualized}
