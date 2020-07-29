@@ -16,14 +16,10 @@ the first two dimensions will be used}
 \itemize{
 \item \code{ks}: Computes density using the \code{kda} function from the
  \code{ks} package.
-Ideal for small-medium datasets (up to 70,000 cells in a desktop computer).
- Use other methods for larger datasets.
 \item \code{wkde}: Computes density using a modified version of the
  \code{kde2d} function from the \code{MASS}
 package to allow weights. Bandwidth selection from the \code{ks} package
  is used instead.
-\item \code{sm}: Computes density using the \code{sm.density} function from
- the \code{sm} package
 }}
 
 \item{adjust}{Numeric value to adjust to bandwidth. Default: 1. Not available
@@ -34,7 +30,7 @@ for \code{ks} method}
 \value{
 If \code{map} is \code{TRUE}, a vector with corresponding densities
  for each observation is returned. Otherwise,
-a war a list with the density estimates from the selected method is returned.
+a list with the density estimates from the selected method is returned.
 }
 \description{
 Estimate weighted kernel density

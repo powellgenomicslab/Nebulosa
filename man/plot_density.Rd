@@ -13,7 +13,7 @@ plot_density(
   joint = FALSE,
   reduction = NULL,
   dims = c(1, 2),
-  method = c("ks", "wkde", "sm"),
+  method = c("ks", "wkde"),
   adjust = 1,
   size = 1,
   shape = 16,
@@ -28,7 +28,7 @@ plot_density(
   joint = FALSE,
   reduction = NULL,
   dims = c(1, 2),
-  method = c("ks", "wkde", "sm"),
+  method = c("ks", "wkde"),
   adjust = 1,
   size = 1,
   shape = 16,
@@ -43,7 +43,7 @@ plot_density(
   joint = FALSE,
   reduction = NULL,
   dims = c(1, 2),
-  method = c("ks", "wkde", "sm"),
+  method = c("ks", "wkde"),
   adjust = 1,
   size = 1,
   shape = 16,
@@ -76,8 +76,6 @@ default, the first two dimensions are considered.}
 \code{kde2d} function from the \code{MASS}
 package to allow weights. Bandwidth selection from the \code{ks} package
  is used instead.
-\item \code{sm}: Computes density using the \code{sm.density} function from
- the \code{sm} package
 }}
 
 \item{adjust}{Numeric value to adjust to bandwidth. Default: 1. Not available
