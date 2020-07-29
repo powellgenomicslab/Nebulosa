@@ -59,10 +59,3 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
         p <- p + scale_color_gradientn(colors = pal)
     }
 }
-
-
-quiet <- function(x) {
-    sink(tempfile())
-    on.exit(sink())
-    invisible(force(x))
-}
