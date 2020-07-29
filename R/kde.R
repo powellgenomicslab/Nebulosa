@@ -83,13 +83,7 @@ get_dens <- function(data, dens, method) {
         iy <- findInterval(data[, 2], dens$y)
         ii <- cbind(ix, iy)
         z <- dens$z[ii]
-    } else {
-        ix <- findInterval(data[, 1], dens$eval.points[, 1])
-        iy <- findInterval(data[, 2], dens$eval.points[, 2])
-        ii <- cbind(ix, iy)
-        z <- dens$estimate[ii]
     }
-
     z
 }
 
@@ -103,21 +97,16 @@ get_dens <- function(data, dens, method) {
 #' \itemize{
 #' \item \code{ks}: Computes density using the \code{kda} function from the
 #'  \code{ks} package.
-#' Ideal for small-medium datasets (up to 70,000 cells in a desktop computer).
-#'  Use other methods for larger datasets.
 #' \item \code{wkde}: Computes density using a modified version of the
 #'  \code{kde2d} function from the \code{MASS}
 #' package to allow weights. Bandwidth selection from the \code{ks} package
 #'  is used instead.
-#' \item \code{sm}: Computes density using the \code{sm.density} function from
-#'  the \code{sm} package
-#' }
 #' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available
 #'  for \code{ks} method
 #' @param map Whether to map densities to individual observations
 #' @return If \code{map} is \code{TRUE}, a vector with corresponding densities
 #'  for each observation is returned. Otherwise,
-#' a war a list with the density estimates from the selected method is returned.
+#' a list with the density estimates from the selected method is returned.
 #' @importFrom ks kde hpi
 #' @importFrom sm sm.density
 #' @examples
@@ -135,18 +124,6 @@ calculate_density <- function(w, x, method, adjust = 1, map = TRUE) {
             w = w / sum(w) * length(w),
             adjust = adjust
         )
-    } else {
-        h1 <- hpi(x[, 1]) * adjust
-        h2 <- hpi(x[, 2]) * adjust
-        h <- c(h1, h2)
-
-        dens <- quiet(sm.density(x[, c(1, 2)],
-                                 weights = w,
-                                 h = c(h1, h2),
-                                 structure.2d = "separate",
-                                 nbins = 0,
-                                 display = "none"
-        ))
     }
 
     if (map) {

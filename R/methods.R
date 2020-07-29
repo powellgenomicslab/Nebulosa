@@ -18,9 +18,6 @@
 #' \code{kde2d} function from the \code{MASS}
 #' package to allow weights. Bandwidth selection from the \code{ks} package
 #'  is used instead.
-#' \item \code{sm}: Computes density using the \code{sm.density} function from
-#'  the \code{sm} package
-#' }
 #' @param adjust Numeric value to adjust to bandwidth. Default: 1. Not available
 #'  for \code{ks} method
 #' @param size Size of the geom to be plotted (e.g. point size)
@@ -46,7 +43,7 @@
 setGeneric("plot_density", function(object, features, slot = NULL,
                                     joint = FALSE, reduction = NULL,
                                     dims = c(1, 2),
-                                    method = c("ks", "wkde", "sm"),
+                                    method = c("ks", "wkde"),
                                     adjust = 1, size = 1, shape = 16,
                                     combine = TRUE, pal = "viridis")
     standardGeneric("plot_density"))
@@ -57,7 +54,7 @@ setGeneric("plot_density", function(object, features, slot = NULL,
 setMethod("plot_density", signature("Seurat"),
           function(object,
                    features, slot = NULL, joint = FALSE, reduction = NULL,
-                   dims = c(1, 2), method = c("ks", "wkde", "sm"), adjust = 1,
+                   dims = c(1, 2), method = c("ks", "wkde"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis") {
 
               # Validate dimensions -----
@@ -114,7 +111,7 @@ setMethod("plot_density", signature("Seurat"),
 setMethod("plot_density", signature("SingleCellExperiment"),
           function(object,
                    features, slot = NULL, joint = FALSE, reduction = NULL,
-                   dims = c(1, 2), method = c("ks", "wkde", "sm"), adjust = 1,
+                   dims = c(1, 2), method = c("ks", "wkde"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis") {
 
               # Validate dimensions -----

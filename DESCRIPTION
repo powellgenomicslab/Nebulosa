@@ -25,7 +25,6 @@ Imports:
     Seurat,
     SingleCellExperiment,
     ks,
-    sm,
     viridis,
     Matrix,
     stats, 
