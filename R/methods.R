@@ -106,6 +106,7 @@ setMethod("plot_density", signature("Seurat"),
 
 
 #' @importFrom SingleCellExperiment reducedDims reducedDim colData
+#' @importFrom SummarizedExperiment assayNames assay
 #' @importFrom Matrix Matrix t
 #' @export
 #' @describeIn plot_density Plot gene-weighted 2D kernel density
@@ -140,6 +141,8 @@ setMethod("plot_density", signature("SingleCellExperiment"),
               # Search for dimensions -----
               cell_embeddings <- .search_dimensions(dims, cell_embeddings,
                                                     reduction)
+              colnames(cell_embeddings) <- paste(reduction, dims, sep = "_")
+              
               # Set up default assay -----
               if (is.null(slot)) slot <- "logcounts"
 
@@ -154,9 +157,9 @@ setMethod("plot_density", signature("SingleCellExperiment"),
                   vars <- metadata[, features, drop = FALSE]
               }else{
                   if (slot == "data") slot <- "logcounts"
-                  assays <- names(object@assays)
+                  assays <- assayNames(object)
                   if (!slot %in% assays) stop(slot, " assay not found")
-                  exp_data <- Matrix::t(object@assays@data[[slot]])
+                  exp_data <- Matrix::t(assay(object, slot))
                   vars <- .extract_feature_data(exp_data, features)
               }
               .plot_final_density(vars, cell_embeddings, features, joint,

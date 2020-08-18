@@ -24,6 +24,7 @@ Depends:
 Imports:
     Seurat,
     SingleCellExperiment,
+    SummarizedExperiment,
     ks,
     viridis,
     Matrix,
@@ -32,7 +33,8 @@ Imports:
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Suggests: 
-    testthat, BiocStyle, knitr, rmarkdown, covr
+    testthat, BiocStyle, knitr, rmarkdown, covr, scater, scran, DropletUtils,
+    igraph, BiocFileCache
 biocViews: 
     Software, GeneExpression, SingleCell, Visualization, 
     DimensionReduction

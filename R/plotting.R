@@ -7,7 +7,6 @@
 #' @param shape Geom shape
 #' @param size Geom size
 #' @param legend_title String used as legend title
-#' @param joint Maximum product of joint densities. For visualization purposes
 #' @param pal String specifying the viridis color palette to use
 #' @return A ggplot object
 #' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs
@@ -17,7 +16,6 @@
 
 plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
                           legend_title,
-                          joint = 0,
                           pal = c(
                               "viridis", "magma", "cividis",
                               "inferno", "plasma"
@@ -51,11 +49,7 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
     } else if (pal == "plasma") {
         pal <- viridis::plasma(10)
     }
-
-
-    if (joint) {
-        p <- p + scale_color_gradientn(colors = pal, limits = c(0, joint))
-    } else {
-        p <- p + scale_color_gradientn(colors = pal)
-    }
+    
+    p + scale_color_gradientn(colors = pal)
+    
 }

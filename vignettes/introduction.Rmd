@@ -3,7 +3,12 @@ title: "Visualization of gene expression with Nebulosa"
 author: "Jose Alquicira-Hernandez"
 package: Nebulosa
 output: 
-  BiocStyle::html_document
+  BiocStyle::html_document:
+    self_contained: yes
+    toc: true
+    toc_float: true
+    toc_depth: 2
+    code_folding: show
 vignette: >
   %\VignetteIndexEntry{Visualization of gene expression with Nebulosa}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,117 +17,161 @@ vignette: >
 
 # Overview
 
-`Nebulosa` is an R package to visualize expression data from single cells based
-on kernel density estimation. Due to the sparsity observed in single-cell data 
-(e.g. RNA-seq, ATAC-seq), the visualization of cell features is frequently 
-affected and unclear, especially when it is overlayed with clustering
-to annotate cell types. `Nebulosa` integrates the "cell density" from a low
-dimensional space along with the expression values of a cell feature (e.g. 
-gene, peak) to draw more informed conclusions about the identity and the
-dynamics of cell populations.
+Due to the sparsity observed in single-cell data (e.g. RNA-seq, ATAC-seq), the 
+visualization of cell features (e.g. gene, peak)  is frequently affected and 
+unclear, especially when it is overlaid with clustering to annotate cell 
+types. `Nebulosa` is an R package to visualize data from single cells based on 
+kernel density estimation. It aims to recover the signal from dropped-out 
+features by incorporating the similarity between cells allowing a "convolution" 
+of the cell features.
+
 
 # Import libraries
   
-For this vignette, let's use `Nebulosa` with the `Seurat` package. 
+For this vignette, let's use `Nebulosa` with the `scran` and `scater` packages. 
 First, we'll do a brief/standard data processing.
 
-```{r import_libraries}
+```{r import_libraries, message=FALSE, warning=FALSE}
 library("Nebulosa")
-library("Seurat")
+library("scater")
+library("scran")
+library("DropletUtils")
+library("BiocFileCache")
 ```
 
 # Data pre-processing
 
-
-Let's download a dataset of 3k PBMCs (available from 10X Genomics). This same 
-dataset is commonly used in Seurat vignettes. The code below will download, 
-store, and uncompress the data in a temporary directory.
+Let's download a dataset of 3k PBMCs (available from 10X Genomics). For the 
+porpoise of this vignette, let's use the `BiocFileChache` package to dowload
+the data and store it in a temporary directory defined by the `tempdir()` 
+function. 
+To import the count data, we'll use the `read10xCounts` from the `DropletUtils` 
+package.
 
 ```{r download_and_untar_file}
-download.file(
-  "https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz",
-  file.path(tempdir(), "pbmc3k.tar.gz")
-)
-
-untar(file.path(tempdir(), "pbmc3k.tar.gz"),
-  exdir = file.path(
-    tempdir(),
-    "pbmc3k"
-  )
-)
-```
-
-
-Then, we can read the gene expression matrix using the `Read10X` from `Seurat`
-
-```{r read_data}
-data <- Read10X(data.dir = file.path(
-  tempdir(),
+bfc <- BiocFileCache(ask = FALSE)
+data_file <- bfcrpath(bfc, file.path(
+  "https://s3-us-west-2.amazonaws.com/10x.files/samples/cell",
   "pbmc3k",
+  "pbmc3k_filtered_gene_bc_matrices.tar.gz"
+))
+
+untar(data_file, exdir = tempdir())
+pbmc <- read10xCounts(file.path(tempdir(),
   "filtered_gene_bc_matrices",
   "hg19"
 ))
 ```
 
-Let's create an object with features being expressed in at least 3 cells and 
-cells expressing at least 200 genes.
 
-```{r create_seurat_object}
-pbmc <- CreateSeuratObject(
-  counts = data,
-  project = "pbmc3k",
-  min.cells = 3,
-  min.features = 200
-)
+The default feature names are _Ensembl_ ids, let's use thegene names and 
+set them as row names of the `sce` object. The following step will use the gene
+names as rownames and make them unique by appending it's corresponding
+_Ensemble_ id when a gene-name duplicate is found.
+
+```{r rename_rows}
+rownames(pbmc) <- uniquifyFeatureNames(rowData(pbmc)[["ID"]],
+                                       rowData(pbmc)[["Symbol"]])
 ```
 
-Remove outlier cells based on the number of genes being expressed in each cell 
-(below 2500 genes) and expression of mitochondrial genes (below 5%).
+# Quality control
 
-```{r qc}
-pbmc[["percent.mt"]] <- PercentageFeatureSet(pbmc, pattern = "^MT-")
-pbmc <- subset(pbmc, subset = nFeature_RNA < 2500 & percent.mt < 5)
+First, let's remove features that are not expressed in at least 3 cells.
+
+```{r filter_features}
+i <- rowSums(counts(pbmc) > 0)
+is_expressed <- i > 3
+pbmc <- pbmc[is_expressed, ]
 ```
+
+And cells not expressing at least one UMI in at least 200 genes.
+
+```{r filter_cells}
+i <- colSums(counts(pbmc) > 0)
+is_expressed <- i > 200
+pbmc <- pbmc[,is_expressed]
+```
+
+
+Finally, let's remove outlier cells based on the number of genes being 
+expressed in each cell, library size, and expression of mitochondrial genes 
+using the `perCellQCMetrics` and `quickPerCellQC` functions from the `scater` 
+package.
+
+```{r qc, warning=FALSE}
+is_mito <- grepl("^MT-", rownames(pbmc))
+qcstats <- perCellQCMetrics(pbmc, subsets = list(Mito = is_mito))
+qcfilter <- quickPerCellQC(qcstats, percent_subsets = c("subsets_Mito_percent"))
+```
+
+> For more information on quality control, please visit the OSCA website: [https://osca.bioconductor.org/quality-control.html](https://osca.bioconductor.org/quality-control.html)
+
 
 ## Data normalization
 
-Let's use `SCTransform` to stabilize the variance of the data by regressing out 
-the effect of the sequencing depth from each cell.
+Let's normalize the data by scaling the counts from each cell across all genes 
+by the sequencing depth of each cell and using a scaling factor of _1 x 10^4_.
+Then, we can stabilize the variance by calculating the pseudo-natural logarithm
+using the `log1p` function.
 
-```{r norm, message=FALSE, warning=FALSE}
-pbmc <- SCTransform(pbmc, verbose = FALSE)
+```{r norm}
+logcounts(pbmc) <- log1p(counts(pbmc) / colSums(counts(pbmc)) * 1e4)
 ```
+
+
+> Please refer to the OSCA website for more details on other normalization 
+strategies: [https://osca.bioconductor.org/normalization.html](https://osca.bioconductor.org/normalization.html)
 
 ## Dimensionality reduction
 
-Once the data is normalized and scaled, we can run a 
-_Principal Component Analysis_  (PCA) first to reduce the dimensions of our 
-data from 26286 features to 50 principal components. To visualize the principal 
-components, we can run a
-_Uniform Manifold Approximation and Projection for Dimension Reduction_ (UMAP) 
-using the first 30 principal components to obtain a two-dimentional space.
+A reduced set of variable genes are expected to drive the major differences 
+between the cell populations. To identify these genes, let's use the 
+`modelGeneVar()` and `getTopHVGsfrom()` from `scran` by selecting the top 3000 
+most highly-variable genes.
 
-```{r dim_red, message=FALSE, warning=FALSE}
-pbmc <- RunPCA(pbmc)
-pbmc <- RunUMAP(pbmc, dims = 1:30)
+```{r modelgenevar}
+dec <- modelGeneVar(pbmc)
+top_hvgs <- getTopHVGs(dec, n = 3000)
 ```
+
+
+Once the data is normalized and highly-variable features have been determined, 
+we can run a _Principal Component Analysis_ (PCA) to reduce the dimensions 
+of our data to 50 principal components. Then, we can run a 
+_Uniform Manifold Approximation and Projection_ (UMAP) 
+using the principal components to obtain a two-dimensional representation that
+could be visualized in a scatter plot.
+
+
+```{r dim_red}
+set.seed(66)
+pbmc <- runPCA(pbmc, scale = TRUE, subset_row = top_hvgs)
+```
+
+
+Finally, we can run the UMAP as follows:
+
+```{r umap}
+pbmc <- runUMAP(pbmc, dimred = "PCA")
+```
+
 
 ## Clustering
 
 To assess cell similarity, let's cluster the data by constructing a 
-_Shared Nearest Neighbor _(SNN) _Graph_ using the first 30 principal components 
-and applying the _Louvain algorithm_.
+_Shared Nearest Neighbor _(SNN) _Graph_ using the first 50 principal components 
+and applying `cluster_louvain()` from the `igraph` package.
 
-```{r clustering, message=FALSE, warning=FALSE}
-pbmc <- FindNeighbors(pbmc, dims = 1:30)
-pbmc <- FindClusters(pbmc)
+```{r clustering}
+g <- buildSNNGraph(pbmc, k = 10, use.dimred = "PCA")
+clust <- igraph::cluster_louvain(g)$membership
+colLabels(pbmc) <- factor(clust)
 ```
 
 
 # Visualize data with `Nebulosa`
 
-The main function from `Nebulosa` is the `plot_density`. For usability, it 
-resembles the `FeaturePlot` function from `Seurat`. 
+The main function from `Nebulosa` is the `plot_density`.
 
 Let's plot the kernel density estimate for `CD4` as follows
 
@@ -130,44 +179,32 @@ Let's plot the kernel density estimate for `CD4` as follows
 plot_density(pbmc, "CD4")
 ```
 
-For comparison, let's also plot a standard scatterplot using `Seurat`
+For comparison, let's also create a standard scatter plot using `scater`
 
 ```{r cd4_comparison}
-FeaturePlot(pbmc, "CD4")
-FeaturePlot(pbmc, "CD4", order = TRUE)
+plotUMAP(pbmc, colour_by = "CD4")
 ```
+
 
 By smoothing the data, `Nebulosa` allows a better visualization of the global 
 expression of CD4 in myeloid and CD4+ T cells. Notice that the "random" 
 expression of CD4 in other areas of the plot is removed as the expression of 
-this gene is not supported by many cells in those areas. Furthermore, CD4+ 
+this gene is not supported by enough cells in those areas. Furthermore, CD4+ 
 cells appear to show considerable dropout rate.
 
-Let's plot the expression of CD4 with `Nebulosa` next to the clustering results
-
-```{r cd4_and_clustering}
-DimPlot(pbmc, label = TRUE, repel = TRUE)
-```
-
-We can now easily identify that clusters `0` and `2` correspond to CD4+ T cells
-if we plot CD3D too.
-
-```{r plot_cd3d}
-plot_density(pbmc, "CD3D")
-```
 
 # Multi-feature visualization
 
-Characterize cell populations usually relies in more than a single marker. 
-Nebulosa allows the visualization of the joint density of from multiple 
+Characterizing cell populations usually relies in more than one marker. 
+Nebulosa also allows the visualization of the joint density from multiple 
 features in a single plot.
 
 ## Identifying Naive CD8+ T cells
 
-Users familiarized with PBMC datasets may know that CD8+ CCR7+ cells usually 
-cluster next to CD4+ CCR7+ and separate from the rest of CD8+ cells. Let's aim 
-to identify Naive CD8+ T cells. To do so, we can just add another gene to the 
-vector containing the features to visualize. 
+Users familiarized with PBMC datasets may be aware that CD8+ CCR7+ cells 
+usually cluster next to CD4+ CCR7+ and separate from the rest of CD8+ cells. 
+Let's aim to identify naive CD8+ T cells. To do so, we can just add another 
+gene to the vector containing the features to visualize. 
 
 ```{r fig.height=10}
 p3 <- plot_density(pbmc, c("CD8A", "CCR7"))
@@ -182,8 +219,13 @@ p4 <- plot_density(pbmc, c("CD8A", "CCR7"), joint = TRUE)
 p4 + plot_layout(ncol = 1)
 ```
 
-When compared to the clustering results, we can easily identify that Naive 
-CD8+ T cells correspond to cluster `8`. 
+When compared to the clustering results, we can identify that Naive 
+CD8+ T cells are contained within cluster `4`. 
+
+
+```{r clusters}
+plotUMAP(pbmc, colour_by = "label", text_by = "label")
+```
 
 
 `Nebulosa` returns the density estimates for each gene along with the joint 
@@ -192,23 +234,37 @@ a list of ggplot objects where the last plot corresponds to the joint density
 estimate.
 
 
-```{r}
+```{r combine_param}
 p_list <- plot_density(pbmc, c("CD8A", "CCR7"), joint = TRUE, combine = FALSE)
 p_list[[length(p_list)]]
 ```
 
 ## Identifying Naive CD4+ T cells
 
-Likewise, the identification of Naive CD4+ T cells becomes straightforward by 
+Likewise, the identification of Naive CD4+ T cells becomes clearer by 
 combining `CD4` and `CCR7`:
 
-```{r fig.height=14}
+```{r joint, fig.height=14}
 p4 <- plot_density(pbmc, c("CD4", "CCR7"), joint = TRUE)
 p4 + plot_layout(ncol = 1)
 ```
 
-Notice that these cells are mainly constrained to cluster `0`
+`CCR7` is predominantly expressed in cluster `4`, and its expression gets 
+reduced  in cluster `2`, which suggests that cluster `4` may consist of most 
+naive T cells (both CD4+ and CD8+). 
 
-```{r fig.height=10}
-p4[[3]] / DimPlot(pbmc, label = TRUE, repel = TRUE)
-```
+
+# Conclusions
+
+In summary,`Nebulosa`can be useful to recover the signal from dropped-out genes
+and improve their visualization in a two-dimensional space. We recommend using 
+`Nebulosa` particularly for dropped-out genes. For fairly well-expressed genes, 
+the direct visualization of the gene expression may be preferable. We encourage 
+users to use `Nebulosa` along with the core visualization methods from the 
+`Seurat` and `Bioconductor` environments as well as other visualization methods 
+to draw more informed conclusions about their data.
+
+
+
+
+

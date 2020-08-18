@@ -8,12 +8,7 @@
     i <- dims %in% seq_len(ncol(cell_embeddings))
     if (!all(i)) {
         missing_dims <- dims[which(!i)]
-        stop(paste(
-            "Dimension(s) ",
-            missing_dims,
-            " not present in",
-            reduction, "\n  "
-        ))
+        stop("Dimension(s) ", missing_dims, " not present in", reduction, "\n")
     }
 
     cell_embeddings <- cell_embeddings[, dims]
@@ -45,29 +40,23 @@
                                 adjust, shape, size, pal, combine) {
     dim_names <- colnames(cell_embeddings)
     if (ncol(vars) > 1) {
-        res <- apply(
-            vars, 2, calculate_density,
-            cell_embeddings, method, adjust
-        )
+        res <- apply(vars, 2, calculate_density, 
+                     cell_embeddings, method, adjust)
         p <- mapply(plot_density_, as.list(as.data.frame(res)), colnames(res),
                     MoreArgs = list(cell_embeddings, dim_names, shape, size,
-                                    "Density",
-                                    pal = pal
-                    ), SIMPLIFY = FALSE
-        )
+                                    "Density", pal = pal), 
+                    SIMPLIFY = FALSE)
 
         if(joint){
 
             z <- apply(res, 1, prod)
-            z_max <- apply(res, 2, max)
-            z_max <- Reduce(`*`, z_max)
-            joint_label <- paste0(paste(features, "+", sep = ""), collapse = " ")
+            joint_label <- paste0(paste(features, "+", sep = ""), 
+                                  collapse = " ")
             pz <- plot_density_(z, joint_label, cell_embeddings,
                                 dim_names,
                                 shape,
                                 size,
                                 "Joint density",
-                                joint = z_max,
                                 pal = pal
             )
 
