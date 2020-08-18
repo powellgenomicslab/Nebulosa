@@ -2,7 +2,7 @@ Package: Nebulosa
 Type: Package
 Title: Single-Cell Data Visualisation Using Kernel Gene-Weighted Density 
     Estimation
-Version: 0.99.91
+Version: 0.99.92
 Authors@R: c(person("Jose", "Alquicira-Hernandez", 
     email = "alquicirajose@gmail.com",
     role = c("aut", "cre"), 
