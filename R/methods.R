@@ -62,7 +62,7 @@ setMethod("plot_density", signature("Seurat"),
               .validate_dimensions(dims)
               # Validate existence of reduction
               if (!is.null(reduction)) {
-                  if (!(reduction %in% names(slot(object, "reductions")))) {
+                  if (!reduction %in% Reductions(object)) {
                       stop("No reduction named '", reduction,
                            "' found in object")
                   }
@@ -76,9 +76,7 @@ setMethod("plot_density", signature("Seurat"),
               if (is.null(reduction)) {
                   reduction <- reduction_list[length(reduction_list)]
               }
-              cell_embeddings <- as.data.frame(Embeddings(
-                  slot(object, "reductions")[[reduction]])
-              )
+              cell_embeddings <- as.data.frame(Embeddings(object[[reduction]]))
 
               # Search for dimensions -----
               cell_embeddings <- .search_dimensions(dims, cell_embeddings,
@@ -90,7 +88,7 @@ setMethod("plot_density", signature("Seurat"),
               method <- match.arg(method)
 
               # Extract metadata
-              metadata <- slot(object, "meta.data")
+              metadata <- object[[]]
 
               # Determine type of feature and extract
               if (all(features %in% colnames(metadata))) {
@@ -142,7 +140,7 @@ setMethod("plot_density", signature("SingleCellExperiment"),
               cell_embeddings <- .search_dimensions(dims, cell_embeddings,
                                                     reduction)
               colnames(cell_embeddings) <- paste(reduction, dims, sep = "_")
-              
+
               # Set up default assay -----
               if (is.null(slot)) slot <- "logcounts"
 
