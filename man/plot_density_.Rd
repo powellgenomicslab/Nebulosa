@@ -12,7 +12,8 @@ plot_density_(
   shape,
   size,
   legend_title,
-  pal = c("viridis", "magma", "cividis", "inferno", "plasma")
+  pal = c("viridis", "magma", "cividis", "inferno", "plasma"),
+  ...
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ plot_density_(
 \item{legend_title}{String used as legend title}
 
 \item{pal}{String specifying the viridis color palette to use}
+
+\item{...}{Further scale arguments passed to scale_color_viridis_c}
 }
 \value{
 A ggplot object

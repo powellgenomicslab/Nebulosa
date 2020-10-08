@@ -26,6 +26,7 @@
 #' @param combine Create a single plot? If \code{FALSE}, a list with ggplot
 #'  objects is returned
 #' @param pal String specifying the viridis color palette to use.
+#' @param ... Further scale arguments passed to scale_color_viridis_c
 #' Options:
 #' \itemize{
 #' \item \code{viridis}
@@ -46,7 +47,8 @@ setGeneric("plot_density", function(object, features, slot = NULL,
                                     dims = c(1, 2),
                                     method = c("ks", "wkde"),
                                     adjust = 1, size = 1, shape = 16,
-                                    combine = TRUE, pal = "viridis")
+                                    combine = TRUE, pal = "viridis",
+                                    ...)
     standardGeneric("plot_density"))
 
 #' @importFrom Seurat GetAssayData Reductions Embeddings FetchData
@@ -56,7 +58,8 @@ setMethod("plot_density", signature("Seurat"),
           function(object,
                    features, slot = NULL, joint = FALSE, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde"), adjust = 1,
-                   size = 1, shape = 16, combine = TRUE, pal = "viridis") {
+                   size = 1, shape = 16, combine = TRUE, pal = "viridis",
+                   ...) {
 
               # Validate dimensions -----
               .validate_dimensions(dims)
@@ -98,7 +101,8 @@ setMethod("plot_density", signature("Seurat"),
                   vars <- .extract_feature_data(exp_data, features)
               }
               .plot_final_density(vars, cell_embeddings, features, joint,
-                                  method, adjust, shape, size, pal, combine)
+                                  method, adjust, shape, size, pal, combine,
+                                  ...)
           })
 
 
@@ -112,7 +116,8 @@ setMethod("plot_density", signature("SingleCellExperiment"),
           function(object,
                    features, slot = NULL, joint = FALSE, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde"), adjust = 1,
-                   size = 1, shape = 16, combine = TRUE, pal = "viridis") {
+                   size = 1, shape = 16, combine = TRUE, pal = "viridis",
+                   ...) {
 
               # Validate dimensions -----
               .validate_dimensions(dims)
@@ -161,5 +166,6 @@ setMethod("plot_density", signature("SingleCellExperiment"),
                   vars <- .extract_feature_data(exp_data, features)
               }
               .plot_final_density(vars, cell_embeddings, features, joint,
-                                  method, adjust, shape, size, pal, combine)
+                                  method, adjust, shape, size, pal, combine,
+                                  ...)
           })

@@ -18,7 +18,8 @@ plot_density(
   size = 1,
   shape = 16,
   combine = TRUE,
-  pal = "viridis"
+  pal = "viridis",
+  ...
 )
 
 \S4method{plot_density}{Seurat}(
@@ -33,7 +34,8 @@ plot_density(
   size = 1,
   shape = 16,
   combine = TRUE,
-  pal = "viridis"
+  pal = "viridis",
+  ...
 )
 
 \S4method{plot_density}{SingleCellExperiment}(
@@ -48,7 +50,8 @@ plot_density(
   size = 1,
   shape = 16,
   combine = TRUE,
-  pal = "viridis"
+  pal = "viridis",
+  ...
 )
 }
 \arguments{
@@ -88,7 +91,9 @@ for \code{ks} method}
 \item{combine}{Create a single plot? If \code{FALSE}, a list with ggplot
 objects is returned}
 
-\item{pal}{String specifying the viridis color palette to use.
+\item{pal}{String specifying the viridis color palette to use.}
+
+\item{...}{Further scale arguments passed to scale_color_viridis_c
 Options:
 \itemize{
 \item \code{viridis}
