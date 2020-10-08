@@ -42,7 +42,7 @@ library("BiocFileCache")
 # Data pre-processing
 
 Let's download a dataset of 3k PBMCs (available from 10X Genomics). For the 
-porpoise of this vignette, let's use the `BiocFileChache` package to dowload
+purpose of this vignette, let's use the `BiocFileChache` package to dowload
 the data and store it in a temporary directory defined by the `tempdir()` 
 function. 
 To import the count data, we'll use the `read10xCounts` from the `DropletUtils` 
