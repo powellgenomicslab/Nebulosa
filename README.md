@@ -2,6 +2,8 @@
 
 <img src="man/figure/logo.png" align="right" height="280"/>
 
+[![](https://img.shields.io/badge/download-130/total-blue.svg)](https://bioconductor.org/packages/stats/bioc/Nebulosa)
+
 [![Build Status](https://travis-ci.org/powellgenomicslab/Nebulosa.svg?branch=master)](https://travis-ci.org/powellgenomicslab/Nebulosa)
 ![https://www.tidyverse.org/lifecycle/#maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)
 
