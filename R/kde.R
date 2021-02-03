@@ -95,7 +95,7 @@ get_dens <- function(data, dens, method) {
 #' the first two dimensions will be used
 #' @param method Kernel density estimation method:
 #' \itemize{
-#' \item \code{ks}: Computes density using the \code{kda} function from the
+#' \item \code{ks}: Computes density using the \code{kde} function from the
 #'  \code{ks} package.
 #' \item \code{wkde}: Computes density using a modified version of the
 #'  \code{kde2d} function from the \code{MASS}
