@@ -1,0 +1,11 @@
+ bibentry(bibtype="article",
+        title = "Nebulosa recovers single-cell gene expression signals by kernel density estimation",
+        author = personList(
+            as.person("Jose Alquicira-Hernandez"),
+            as.person("Joseph E. Powell")
+        ),
+        year = 2021,
+        journal = "Bioinformatics",
+        doi = "10.1093/bioinformatics/btab003", 
+        url = "https://academic.oup.com/bioinformatics/advance-article-abstract/doi/10.1093/bioinformatics/btab003/6103785"
+    )
