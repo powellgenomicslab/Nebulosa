@@ -40,7 +40,7 @@
 #' @export
 #' @examples
 #'
-#' data <- Seurat::pbmc_small
+#' data <- SeuratObject::pbmc_small
 #' plot_density(data, "CD3E")
 setGeneric("plot_density", function(object, features, slot = NULL,
                                     joint = FALSE, reduction = NULL,
