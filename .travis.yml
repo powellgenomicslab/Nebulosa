@@ -1,7 +1,6 @@
 language: r
 sudo: true
 cache: 
-  - packages
   timeout: 1000
 warnings_are_errors: false
 
