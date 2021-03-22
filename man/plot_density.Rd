@@ -119,7 +119,7 @@ Plot gene-weighted 2D kernel density
 
 \examples{
 
-data <- Seurat::pbmc_small
+data <- SeuratObject::pbmc_small
 plot_density(data, "CD3E")
 }
 \author{

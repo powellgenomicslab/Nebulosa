@@ -25,6 +25,7 @@ Imports:
     Seurat,
     SingleCellExperiment,
     SummarizedExperiment,
+    SeuratObject,
     ks,
     Matrix,
     stats, 
