@@ -1,7 +1,8 @@
 language: r
 sudo: true
-cache: packages
-timeout: 6000
+cache: 
+  packages: true
+  timeout: 6000
 warnings_are_errors: false
 
 # Environment variables for builds
