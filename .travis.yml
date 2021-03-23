@@ -1,7 +1,7 @@
 language: r
 sudo: true
 cache: 
-  timeout: 3000
+  timeout: 5000
 warnings_are_errors: false
 
 # Environment variables for builds
