@@ -9,6 +9,7 @@ warnings_are_errors: false
 env:
   global:
   - R_BUILD_ARGS="--no-build-vignettes --no-manual"
+  - _R_CHECK_FORCE_SUGGESTS_=false
 
 # Avoid building vignettes
 r_build_args: --no-build-vignettes --no-manual
