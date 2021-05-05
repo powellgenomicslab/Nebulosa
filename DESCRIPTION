@@ -22,7 +22,6 @@ Depends:
     ggplot2,
     patchwork
 Imports:
-    Seurat,
     SingleCellExperiment,
     SummarizedExperiment,
     SeuratObject,
@@ -34,7 +33,7 @@ RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 Suggests: 
     testthat, BiocStyle, knitr, rmarkdown, covr, scater, scran, DropletUtils,
-    igraph, BiocFileCache
+    igraph, BiocFileCache, Seurat
 biocViews: 
     Software, GeneExpression, SingleCell, Visualization, 
     DimensionReduction
