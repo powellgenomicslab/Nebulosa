@@ -34,6 +34,9 @@
 #' \item \code{cividis}
 #' \item \code{inferno}
 #' \item \code{plasma}
+#' \item \code{mako}
+#' \item \code{rocket}
+#' \item \code{turbo}
 #' }
 #' @return A scatterplot from a given reduction showing the gene-weighted
 #'  density
