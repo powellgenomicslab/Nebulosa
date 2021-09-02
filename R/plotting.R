@@ -17,7 +17,8 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
                           legend_title,
                           pal = c(
                               "viridis", "magma", "cividis",
-                              "inferno", "plasma"
+                              "inferno", "plasma", "mako",
+                              "rocket","turbo"
                           ), ...) {
     p <- ggplot(data.frame(cell_embeddings, feature = z)) +
         aes_string(dim_names[1], dim_names[2], color = "feature") +
@@ -37,5 +38,5 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
 
     pal <- match.arg(pal)
     p + scale_color_viridis_c(option = pal, ...)
-    
+
 }
