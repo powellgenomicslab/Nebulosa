@@ -53,7 +53,7 @@ setGeneric("plot_density", function(object, features, slot = NULL,
                                     ...)
     standardGeneric("plot_density"))
 
-#' @importFrom Seurat GetAssayData Reductions Embeddings FetchData
+#' @importFrom SeuratObject GetAssayData Reductions Embeddings FetchData
 #' @export
 #' @describeIn plot_density Plot gene-weighted 2D kernel density
 setMethod("plot_density", signature("Seurat"),
