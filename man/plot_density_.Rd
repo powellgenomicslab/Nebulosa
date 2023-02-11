@@ -13,6 +13,7 @@ plot_density_(
   size,
   legend_title,
   pal = c("viridis", "magma", "cividis", "inferno", "plasma"),
+  raster,
   ...
 )
 }
@@ -32,6 +33,8 @@ plot_density_(
 \item{legend_title}{String used as legend title}
 
 \item{pal}{String specifying the viridis color palette to use}
+
+\item{raster}{Rasterise plot}
 
 \item{...}{Further scale arguments passed to scale_color_viridis_c}
 }

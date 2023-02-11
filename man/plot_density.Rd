@@ -19,6 +19,7 @@ plot_density(
   shape = 16,
   combine = TRUE,
   pal = "viridis",
+  raster = TRUE,
   ...
 )
 
@@ -35,6 +36,7 @@ plot_density(
   shape = 16,
   combine = TRUE,
   pal = "viridis",
+  raster = TRUE,
   ...
 )
 
@@ -51,6 +53,7 @@ plot_density(
   shape = 16,
   combine = TRUE,
   pal = "viridis",
+  raster = TRUE,
   ...
 )
 }
@@ -93,6 +96,8 @@ objects is returned}
 
 \item{pal}{String specifying the viridis color palette to use.}
 
+\item{raster}{Rasterise plot}
+
 \item{...}{Further scale arguments passed to scale_color_viridis_c
 Options:
 \itemize{
@@ -112,11 +117,11 @@ Plot gene-weighted 2D kernel density
 }
 \section{Methods (by class)}{
 \itemize{
-\item \code{Seurat}: Plot gene-weighted 2D kernel density
+\item \code{plot_density(Seurat)}: Plot gene-weighted 2D kernel density
 
-\item \code{SingleCellExperiment}: Plot gene-weighted 2D kernel density
+\item \code{plot_density(SingleCellExperiment)}: Plot gene-weighted 2D kernel density
+
 }}
-
 \examples{
 
 data <- SeuratObject::pbmc_small

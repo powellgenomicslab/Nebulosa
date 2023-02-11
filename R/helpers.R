@@ -37,14 +37,14 @@
 
 #' @importFrom patchwork wrap_plots
 .plot_final_density <- function(vars, cell_embeddings, features, joint, method,
-                                adjust, shape, size, pal, combine, ...) {
+                                adjust, shape, size, pal, combine, raster, ...) {
     dim_names <- colnames(cell_embeddings)
     if (ncol(vars) > 1) {
         res <- apply(vars, 2, calculate_density, 
                      cell_embeddings, method, adjust)
         p <- mapply(plot_density_, as.list(as.data.frame(res)), colnames(res),
                     MoreArgs = list(cell_embeddings, dim_names, shape, size,
-                                    "Density", pal = pal, ...), 
+                                    "Density", pal = pal, raster, ...), 
                     SIMPLIFY = FALSE)
 
         if(joint){
@@ -58,6 +58,7 @@
                                 size,
                                 "Joint density",
                                 pal = pal,
+                                raster,
                                 ...
             )
 
@@ -86,6 +87,7 @@
                            size,
                            "Density",
                            pal = pal,
+                           raster,
                            ...
         )
     }

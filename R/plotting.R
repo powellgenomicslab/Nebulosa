@@ -8,17 +8,21 @@
 #' @param size Geom size
 #' @param legend_title String used as legend title
 #' @param pal String specifying the viridis color palette to use
+#' @param raster Rasterise plot
 #' @param ... Further scale arguments passed to scale_color_viridis_c
 #' @return A ggplot object
 #' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs
 #' guide_legend theme element_text element_line element_rect element_blank
 #' scale_color_viridis_c scale_color_gradientn
+#' @importFrom ggrastr rasterise
 plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
                           legend_title,
                           pal = c(
                               "viridis", "magma", "cividis",
                               "inferno", "plasma"
-                          ), ...) {
+                          ), 
+                          raster, 
+                          ...) {
     p <- ggplot(data.frame(cell_embeddings, feature = z)) +
         aes_string(dim_names[1], dim_names[2], color = "feature") +
         geom_point(shape = shape, size = size) +
@@ -36,6 +40,12 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
         )
 
     pal <- match.arg(pal)
-    p + scale_color_viridis_c(option = pal, ...)
+    p <- p + scale_color_viridis_c(option = pal, ...)
+    
+    if(raster){
+      rasterise(p, dpi = 300)
+    }else{
+      p
+    }
     
 }

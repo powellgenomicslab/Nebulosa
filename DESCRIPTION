@@ -16,7 +16,6 @@ URL: https://github.com/powellgenomicslab/Nebulosa
 BugReports: https://github.com/powellgenomicslab/Nebulosa/issues
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
 Depends:
     R (>= 4.0),
     ggplot2,
@@ -25,12 +24,12 @@ Imports:
     Seurat,
     SingleCellExperiment,
     SummarizedExperiment,
-    SeuratObject,
     ks,
     Matrix,
     stats, 
-    methods
-RoxygenNote: 7.1.1
+    methods,
+    ggrastr
+RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 Suggests: 
     testthat, BiocStyle, knitr, rmarkdown, covr, scater, scran, DropletUtils,

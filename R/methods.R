@@ -26,6 +26,7 @@
 #' @param combine Create a single plot? If \code{FALSE}, a list with ggplot
 #'  objects is returned
 #' @param pal String specifying the viridis color palette to use.
+#' @param raster Rasterise plot
 #' @param ... Further scale arguments passed to scale_color_viridis_c
 #' Options:
 #' \itemize{
@@ -48,6 +49,7 @@ setGeneric("plot_density", function(object, features, slot = NULL,
                                     method = c("ks", "wkde"),
                                     adjust = 1, size = 1, shape = 16,
                                     combine = TRUE, pal = "viridis",
+                                    raster = TRUE,
                                     ...)
     standardGeneric("plot_density"))
 
@@ -59,7 +61,7 @@ setMethod("plot_density", signature("Seurat"),
                    features, slot = NULL, joint = FALSE, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis",
-                   ...) {
+                   raster = TRUE, ...) {
 
               # Validate dimensions -----
               .validate_dimensions(dims)
@@ -102,7 +104,7 @@ setMethod("plot_density", signature("Seurat"),
               }
               .plot_final_density(vars, cell_embeddings, features, joint,
                                   method, adjust, shape, size, pal, combine,
-                                  ...)
+                                  raster, ...)
           })
 
 
@@ -117,7 +119,7 @@ setMethod("plot_density", signature("SingleCellExperiment"),
                    features, slot = NULL, joint = FALSE, reduction = NULL,
                    dims = c(1, 2), method = c("ks", "wkde"), adjust = 1,
                    size = 1, shape = 16, combine = TRUE, pal = "viridis",
-                   ...) {
+                   raster = TRUE, ...) {
 
               # Validate dimensions -----
               .validate_dimensions(dims)
@@ -167,5 +169,6 @@ setMethod("plot_density", signature("SingleCellExperiment"),
               }
               .plot_final_density(vars, cell_embeddings, features, joint,
                                   method, adjust, shape, size, pal, combine,
+                                  raster,
                                   ...)
           })
