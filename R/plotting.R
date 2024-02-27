@@ -29,7 +29,7 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
         xlab(gsub("_", " ", dim_names[1])) +
         ylab(gsub("_", " ", dim_names[2])) +
         ggtitle(feature) +
-        labs(color = guide_legend(legend_title)) +
+        labs(color = legend_title) +
         theme(
             text = element_text(size = 14),
             panel.background = element_blank(),
