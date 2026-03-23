@@ -113,15 +113,41 @@ get_dens <- function(data, dens, method) {
 #'
 #' dens <- Nebulosa:::calculate_density(iris[, 3], iris[, 1:2], method = "wkde")
 calculate_density <- function(w, x, method, adjust = 1, map = TRUE) {
+    total_weight <- sum(w)
+    if (!is.finite(total_weight) || total_weight <= 0) {
+        if (map) {
+            return(rep(0, nrow(x)))
+        }
+
+        zero_grid <- matrix(0, nrow = 100, ncol = 100)
+        return(
+            if (method == "ks") {
+                list(
+                    eval.points = list(
+                        seq.int(min(x[, 1]), max(x[, 1]), length.out = 100),
+                        seq.int(min(x[, 2]), max(x[, 2]), length.out = 100)
+                    ),
+                    estimate = zero_grid
+                )
+            } else {
+                list(
+                    x = seq.int(min(x[, 1]), max(x[, 1]), length.out = 100),
+                    y = seq.int(min(x[, 2]), max(x[, 2]), length.out = 100),
+                    z = zero_grid
+                )
+            }
+        )
+    }
+
     if (method == "ks") {
         dens <- kde(x[, c(1, 2)],
-                    w = w / sum(w) * length(w)
+                    w = w / total_weight * length(w)
         )
     } else if (method == "wkde") {
         dens <- wkde2d(
             x = x[, 1],
             y = x[, 2],
-            w = w / sum(w) * length(w),
+            w = w / total_weight * length(w),
             adjust = adjust
         )
     }
