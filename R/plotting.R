@@ -11,7 +11,7 @@
 #' @param raster Rasterise plot
 #' @param ... Further scale arguments passed to scale_color_viridis_c
 #' @return A ggplot object
-#' @importFrom ggplot2 ggplot aes_string geom_point xlab ylab ggtitle labs
+#' @importFrom ggplot2 ggplot aes geom_point xlab ylab ggtitle labs
 #' guide_legend theme element_text element_line element_rect element_blank
 #' scale_color_viridis_c scale_color_gradientn
 #' @importFrom ggrastr rasterise
@@ -23,8 +23,15 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
                           ), 
                           raster, 
                           ...) {
-    p <- ggplot(data.frame(cell_embeddings, feature = z)) +
-        aes_string(dim_names[1], dim_names[2], color = "feature") +
+    plot_data <- data.frame(cell_embeddings, feature = z)
+    p <- ggplot(
+        plot_data,
+        aes(
+            x = .data[[dim_names[1]]],
+            y = .data[[dim_names[2]]],
+            color = .data[["feature"]]
+        )
+    ) +
         geom_point(shape = shape, size = size) +
         xlab(gsub("_", " ", dim_names[1])) +
         ylab(gsub("_", " ", dim_names[2])) +
@@ -35,7 +42,7 @@ plot_density_ <- function(z, feature, cell_embeddings, dim_names, shape, size,
             panel.background = element_blank(),
             axis.text.x = element_text(color = "black"),
             axis.text.y = element_text(color = "black"),
-            axis.line = element_line(size = 0.25),
+            axis.line = element_line(linewidth = 0.25),
             strip.background = element_rect(color = "black", fill = "#ffe5cc")
         )
 
